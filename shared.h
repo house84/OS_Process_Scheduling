@@ -39,7 +39,14 @@ struct message_Buffer_2{
   long msg_type; 
   char msg_text[100]; 
 
-}message2; 
+}message2;
+
+
+//Shared System Time
+struct system_Time{
+
+  int seconds;               //Seconds for System time
+  int nanoSeconds;           //NanoSeconds for system time
 
 
 #endif
