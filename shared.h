@@ -25,21 +25,12 @@ struct pcb{
 
 
 //Messaging for Sending
-struct message_Buffer_1{
+struct message_Buffer{
 
   long msg_type; 
   char msg_text[100];
 
-}message1;
-
-
-//Messaging for Receiving
-struct message_Buffer_2{
-
-  long msg_type; 
-  char msg_text[100]; 
-
-}message2;
+}message; 
 
 
 //Shared System Time
@@ -47,6 +38,6 @@ struct system_Time{
 
   int seconds;               //Seconds for System time
   int nanoSeconds;           //NanoSeconds for system time
-
+}
 
 #endif

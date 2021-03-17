@@ -23,7 +23,8 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <time.h>
-
+#include "user.h"
+#include "shared.h"
 
 
 
