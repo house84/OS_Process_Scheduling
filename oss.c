@@ -1,7 +1,8 @@
 /*
  * Author: Nick House
- * Program: oss.c
  * Project: Process Scheduling
+ * Coures: CS-4760 Operating Systems, Spring 2021
+ * File Name: oss.c
  */
 
 #include <semaphore.h>
@@ -30,60 +31,122 @@
 
 int main(int argc, char * argv[]){
 
-	printf("Test Program: %s\n", argv[0]); 
 
+	//===========Begin Project Coding============//
 	
+	//Initialize Signal Handling
+	signal(SIGINT, signalHandler); 
 
-	//Create Buffer of Ready Processes
+
+	//Set Initial Parameters
+	memset(logfile, '\0', sizeof(logfile)); 
+	strcpy(logfile, "logfile"); 
+	myTimer = 100; 
+
+	//Parse input Args
+	int c = 0; 
 	
+	while(( c = getopt(argc, argv, "hs:l:")) != -1){
+
+	  switch(c){
+				case 'h':	help(argv[0]); 
+							exit(EXIT_SUCCESS); 
+
+				case 's': 	//Set Time
+							myTimer = atoi(optarg); 
+							break; 
+
+				case 'l':	//Set logfile Name
+							memset(logfile, '\0', sizeof(logfile));
+							strcpy(logfile, optarg); 
+							break; 
+
+				case ':':	//Print Missing Arg Message
+							fprintf(stderr, "Arguments Required, see usage [-h]\n"); 
+							exit(EXIT_FAILURE); 
+							break; 
+
+				defalut:	//Defalut Failure Exit
+							fprintf(stderr, "Invalid Argument, see usage [-h]\n"); 
+							exit(EXIT_FAILURE); 
+				}
+
+	}
 
 
-	/*	How to use Circular Queues
-	 *
-	 * 	//HEADNAME = Struct to be defined
-	 *  //TYPE = Type of the elements to be linked 
-	 *	CIRCLE_HEAD(HEADNAME, TYPE) head; 	//Declare Circle Head
-	 *
-	 *	struct HEADNAM *headp; 			//Pointer to the Head of circular queue
-	 *
-	 *	CIRCLEQ_EMPTY(); 				//Checks if circle queue is empty
-	 *	CIRCLEQ_FOREACH(); 				//Traverses forward and assigns var
-	 *	CIRCLEQ_FOREACH_REVERSE(); 		//Traverses Backward and assigns var
-	 *	CIRCLEQ_INIT();					//Initializes circular Queue by head
-	 *	CIRCLEQ_INSERT_HEAD(); 			//Inserts new element at head
-	 *	CIRLCEQ_INSERT_TAIL(); 			//Inserts new element at end
-	 *	CIRCELQ_INSERT_AFTER(); 		//Inserts new element before list elm
-	 *	CIRCLEQ_INSERT_BEFORE(); 		//Inserts new element after list elm
-	 *	CIRLCEQ_LAST();					//Returns Last item on queue
-	 *	CIRCLEQ_NEXT(); 				//Returns next item on list
-	 *	CIRCLEQ_PREV(); 				//Returns previous item on list
-	 *	CIRLCEQ_LOOP_NEXT(); 			//Returns next item, elm
-	 *	CIRLCEQ_LOOP_PREV(); 			//Returns previous item, elm
-	 *	CIRCLEQ__REMOVE(); 				//Removes the element elm queue
-	 */
+	//Testing Output
+	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
-	//Initialize Items for CircleQ
-	struct entry *readyQueue;                        //Ready Processes Queue
-	struct entry *blockedQueue;                      //Blocked Processes Queue
-	struct circlehead head;                         //Queue Head
-	CIRCLEQ_INIT(&head);                            //Initialize the queue
-
-	//Initialize Simulated CPU Resource
-	struct CPU cpu;                                 //CPU Resource 
-	
-	readyQueue = malloc(sizeof(struct entry));      //Insert at head
-	CIRCLEQ_INSERT_HEAD(&head, readyQueue, entries); 
-
-	readyQueue = malloc(sizeof(struct entry));      //Insert at tail
-	CIRLCEQ_INSERT_TAIL(&head, readyQueue, entries); 
-
-	
-
-
-
-	
-		
 
 	return 0; 
+
+}
+
+
+//Signal Handler
+void signalHandler(int sig){
+
+  	//set sigFlag to block the creation of an further child processes
+ 	sigFlag == true; 
+
+  	//openLogfile(); 
+  
+  	//time(&t); 
+  
+  	//Check for Signal Type
+  	if( sig == SIGINT ) {
+
+		fprintf(stderr, "\nProgram Terminated by User\n"); 
+		//fprintf(shmptr->logfilePtr, "\nTime: %sProgram Terminated by User\n", ctime(&t)); 
+	
+  	}else if( sig == 3126 ){
+
+	  	fprintf(stderr, "\nAll Processes have finished\n"); 
+	  	//fprintf(shmptr->logfilePtr, "\nTime: %sAll Processes have finished\n", ctime(&t));
+	
+	}else{
+
+	  	fprintf(stderr, "\nProgram Terminated due to Timer\n"); 
+		//fprintf(shmptr->logfilePtr, "\nTime: %sProgram Termintated due to Timer\n", ctime(&t)); 
+
+	}
+
+
+	//fprintf(shmptr->logfilePtr,"\n//****************** END FILE ENTRY ********************//\n\n"); 
+	
+	//closeLogfile(); 
+	
+	//Allow Potential Creating Processes to add PID to Array
+	//while(flag == true){}
+	
+	//Free Memory Resources
+	//freeMemory();
+	
+	if( sig == 3126 ) { exit(EXIT_SUCCESS); }
+
+	//Terminate Child Processes
+	//int i; 
+	//for( i = 0; i < totalProc; ++i({
+	//    
+	//    if(kill(pidArray[i], SIGKILL ) == -1 && errno != ERSCH ){
+	//    		
+	//        perror("oss: ERROR: Failed to Kill Processes "); 
+	//        exit(EXIT_FAILURE); 
+	//
+	//    }
+	
+	//Destroy Potential Zombies
+	//while( wait(NULL) != -1 || errno == EINTR ); 
+
+	exit(EXIT_SUCCESS); 
+}
+
+void help(char *program){
+
+  	printf("\n//=== %s Usage Page ===//\n", program);  
+	printf("\n%s [-h][-s t][-l f]\n", program); 
+	printf("%s -h      This Usage Page\n", program); 
+	printf("%s -s t    Time in seconds before program terminates\n", program); 
+	printf("%s -l f    Specifies the name for generated logfile\n\n", program); 
 
 }
