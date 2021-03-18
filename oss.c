@@ -5,38 +5,16 @@
  * File Name: oss.c
  */
 
-#include <semaphore.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/msg.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <limits.h>
-#include <errno.h>
-#include <math.h>
-#include <stdbool.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/queue.h>
+#include "library.h"
 #include "oss.h"
 #include "shared.h"
-
+#include "sysTime.h"
 
 int main(int argc, char * argv[]){
 
-
-	//===========Begin Project Coding============//
 	
 	//Initialize Signal Handling
 	signal(SIGINT, signalHandler); 
-
 
 	//Set Initial Parameters
 	memset(logfile, '\0', sizeof(logfile)); 
@@ -74,9 +52,28 @@ int main(int argc, char * argv[]){
 	}
 
 
+	//Check Timer > 0
+	if(myTimer < 1){
+
+	  	fprintf(stderr, "Time -s must be greater than zero\n"); 
+	 	exit(EXIT_FAILURE); 
+	}
+	
+	//Set timer
+	setTimer(myTimer); 
+
+	//Create Shared Memory
+	createSharedMemory(); 
+	
+	//Free Shared Memory
+	freeSharedMemory(); 
+
 	//Testing Output
 	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
+
+
+
 
 	return 0; 
 
@@ -120,7 +117,10 @@ void signalHandler(int sig){
 	//while(flag == true){}
 	
 	//Free Memory Resources
-	//freeMemory();
+	//freeSharedMemory();
+	
+	//Free Message Memory
+	//freeSharedMessage(); 
 	
 	if( sig == 3126 ) { exit(EXIT_SUCCESS); }
 
@@ -141,6 +141,8 @@ void signalHandler(int sig){
 	exit(EXIT_SUCCESS); 
 }
 
+
+//Display Usage
 void help(char *program){
 
   	printf("\n//=== %s Usage Page ===//\n", program);  
@@ -149,4 +151,60 @@ void help(char *program){
 	printf("%s -s t    Time in seconds before program terminates\n", program); 
 	printf("%s -l f    Specifies the name for generated logfile\n\n", program); 
 
+}
+
+
+//Set Timer
+static void setTimer(int t){
+
+  	signal(SIGALRM, signalHandler); 
+	
+	timer.it_value.tv_sec = t; 
+	timer.it_value.tv_usec = 0; 
+	timer.it_interval.tv_sec = 0; 
+	timer.it_interval.tv_usec = 0; 
+
+	if(setitimer(ITIMER_REAL, &timer, NULL) == -1){
+
+		perror("oss: ERROR: Failed to set timer setitimer() ");
+		exit(EXIT_FAILURE);
+	}
+}
+
+
+//Create System Time Shared Memory
+static void createSharedMemory(){  
+
+	keySysTime = ftok("Makefile", 'a'); 
+	
+	shmidSysTime = shmget(keySysTime, sizeof(struct system_Time), IPC_CREAT|S_IRUSR|S_IWUSR); 
+	
+	if(shmidSysTime == -1){
+
+	  perror("oss: ERROR: Failed to Generate sys_Time id shmget() "); 
+	  exit(EXIT_FAILURE); 
+	
+	}
+
+	sysTimePtr = (struct system_Time *) shmat(shmidSysTime, NULL, 0); 
+
+}
+
+
+//Free Shared Memory
+static void freeSharedMemory(){
+
+	//Detach System Pointer
+	if(shmdt(sysTimePtr) == -1){
+		
+		perror("oss: ERROR: Failed to detach shmidSysTime, shmdt() "); 
+		exit(EXIT_FAILURE); 
+	}
+
+	//Destroy System Time Memory
+	if(shmctl(shmidSysTime, IPC_RMID, NULL) == -1){
+		
+		perror("oss: ERROR: Failed to Desttory sysTimePtr, shmctl() "); 
+		exit(EXIT_FAILURE); 
+	}
 }

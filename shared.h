@@ -7,10 +7,8 @@
 #ifndef SHARED_H
 #define SHARED_H
 
-#define messageSize
-
-//Process Controll Block 
-struct pcb{
+//Process Control Block 
+struct PCB{
                              
   //Simulated Time Values
   int cpu_Time;              //Time spent on CPU 
@@ -19,10 +17,9 @@ struct pcb{
   int block_Time;            //Time spent Blocked
   int unblocked_Time;        //Time spent UnBlocked
   int proc_id_Sem;           //Simulated PID         
-  pid_t proc_id;             //Process Id 
+ // pid_t proc_id;             //Process Id 
 
 }; 
-
 
 //Messaging for Sending
 struct message_Buffer{
@@ -30,14 +27,7 @@ struct message_Buffer{
   long msg_type; 
   char msg_text[100];
 
-}message; 
-
-
-//Shared System Time
-struct system_Time{
-
-  int seconds;               //Seconds for System time
-  int nanoSeconds;           //NanoSeconds for system time
-}
+};
+ 
 
 #endif
