@@ -24,8 +24,9 @@ static void createSharedMemory();
 
 key_t keySysTime;                       //Shm Key
 size_t memSize;                         //memSize for getshm()
-int shmidSysTime;                       //Variable for Shm Id value
-struct system_Time *sysTimePtr;         //Pointer for System Time
+
+key_t keyMsg;                           //Shm Key for Message Q
+
 struct itimerval timer;                 //Set Timer
 
 pid_t pidArray[100];                    //Variable for Process PID's

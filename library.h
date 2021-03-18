@@ -28,5 +28,13 @@
 #include <sys/time.h>
 #include <sys/queue.h>
 #include <sys/wait.h>
+#include "messaging.h"
+
+struct msgBuf buf; 
+
+int shmidSysTime; 
+struct system_Time *sysTimePtr; 
+
+int shmidMsg; 
 
 #endif

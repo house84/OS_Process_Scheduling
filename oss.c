@@ -94,8 +94,18 @@ int main(int argc, char * argv[]){
 	for(i = 0; i < 5; ++i){
 
 		incrementSysTime(100000000); 
-	//	sleep(1);
 	}
+
+	//Test message Recieving From User
+	for(i = 1; i<3; ++i){
+
+		//msgrcv(msgID, message, sizeof(), address, wait)
+		msgrcv(shmidMsg, &buf, sizeof(buf.mtext), i, 0); 
+
+		fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
+
+	}
+	
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){}
@@ -207,21 +217,38 @@ static void setTimer(int t){
 }
 
 
-//Create System Time Shared Memory
+//Create Shared Memory
 static void createSharedMemory(){  
 
-	keySysTime = ftok("Makefile", 'a'); 
-	
-	shmidSysTime = shmget(keySysTime, sizeof(struct system_Time), IPC_CREAT|S_IRUSR|S_IWUSR); 
-	
-	if(shmidSysTime == -1){
-
-	  perror("oss: ERROR: Failed to Generate sys_Time id shmget() "); 
-	  exit(EXIT_FAILURE); 
-	
+	//=== System Time Shared Memory
+	if((keySysTime = ftok("Makefile", 'a')) == -1){
+		
+		perror("oss: ERROR: Failed to generate keySysTime ftok() ");
+		exit(EXIT_FAILURE); 
 	}
+	
+	if((shmidSysTime = shmget(keySysTime, sizeof(struct system_Time), IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+		
+		perror("oss: ERROR: Failed to get shmidSysTime, shmget() ");
+		exit(EXIT_FAILURE); 
+	}
+	
 
 	sysTimePtr = (struct system_Time *) shmat(shmidSysTime, NULL, 0); 
+
+
+	//=== Messaging Q Memory
+	if((keyMsg = ftok("oss.c", 'a')) == -1){
+		
+		perror("oss: ERROR: Failed to generate keyMsg, ftok() ");
+		exit(EXIT_FAILURE);
+	}
+	
+	if((shmidMsg = msgget(keyMsg, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+
+		perror("oss: ERROR: Failed to generate shmidMsg, msgget() "); 
+		exit(EXIT_FAILURE); 
+	}
 
 }
 
@@ -240,6 +267,14 @@ static void freeSharedMemory(){
 	if(shmctl(shmidSysTime, IPC_RMID, NULL) == -1){
 		
 		perror("oss: ERROR: Failed to Desttory sysTimePtr, shmctl() "); 
+		exit(EXIT_FAILURE); 
+	}
+
+	
+	//Destroy Message Q
+	if(msgctl(shmidMsg, IPC_RMID, NULL) == -1){
+
+		perror("oss: ERROR: Failed to Destroy shmidMsg, msgctl() "); 
 		exit(EXIT_FAILURE); 
 	}
 }
@@ -306,10 +341,14 @@ static void spawn(int idx){
 
 		//shmidSysTime arg
 		char buffer_sysTime[50]; 
-		sprintf(buffer_sysTime, "%d", shmidSysTime); 
+		sprintf(buffer_sysTime, "%d", shmidSysTime);
+
+		//shmidMsg arg
+		char buffer_msgId[50];
+		sprintf(buffer_msgId, "%d", shmidMsg); 
 
 		//Call user file with child process
-		if(execl("./user", "user", buffer_idx, buffer_sysTime, (char*) NULL)){
+		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId, (char*) NULL)){
 
 			perror("oss: ERROR: Failed to execl() child process "); 
 			exit(EXIT_FAILURE); 
