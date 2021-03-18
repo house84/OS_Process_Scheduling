@@ -28,8 +28,9 @@ int shmidSysTime;                       //Variable for Shm Id value
 struct system_Time *sysTimePtr;         //Pointer for System Time
 struct itimerval timer;                 //Set Timer
 
-pid_t *pidArray;                        //Variable for Process PID's
+pid_t pidArray[100];                    //Variable for Process PID's
 bool sigFlag;                           //Variable to pause termination
+bool spawnFlag;                         //Varialbe to signal forking process
 
 int logLines;                           //Holds Number of lines in logfile
 int myTimer;                            //Timer Value

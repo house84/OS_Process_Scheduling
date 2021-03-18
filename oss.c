@@ -11,7 +11,10 @@
 #include "sysTime.h"
 
 int main(int argc, char * argv[]){
-
+	
+	//Set Bool
+	sigFlag = false; 
+	spawnFlag = false; 
 	
 	//Initialize Signal Handling
 	signal(SIGINT, signalHandler); 
@@ -71,14 +74,31 @@ int main(int argc, char * argv[]){
 	//=========== Add Program Logic =============
 	
 	int i; 
-	for(i = 0; i < 100; ++i){
+	for(i = 0; i < 2; ++i){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
 
 		//Show Timer
-		//showSysTime(); 
+		//showSysTime();
+		
+		//Spawn Child Process
+		spawn(i); 
+
+		//Test Slowdown
+		sleep(1);
+
 	}
+
+	//Testing Timer
+	for(i = 0; i < 5; ++i){
+
+		incrementSysTime(100000000); 
+	//	sleep(1);
+	}
+
+	//Allow Processes to finish
+	while(wait(NULL) > 0){}
 
 	//Free Shared Memory
 	freeSharedMemory(); 
@@ -129,7 +149,7 @@ void signalHandler(int sig){
 	//closeLogfile(); 
 	
 	//Allow Potential Creating Processes to add PID to Array
-	//while(flag == true){}
+	while(spawnFlag == true){}
 	
 	//Free Memory Resources
 	//freeSharedMemory();
@@ -253,3 +273,52 @@ static void showSysTime(){
 	printf("System Time (seconds)-> %03d:%09d\n",sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
 
 }
+
+
+//Spawn Child Process
+static void spawn(int idx){
+
+	//Check if prograom is terminating
+	if(sigFlag == true) { return; }
+
+	pid_t process_id; 
+
+	if((process_id = fork()) < 0){
+
+		perror("oss: ERROR: Failed to fork process fork() ");
+		exit(EXIT_FAILURE); 
+	}
+
+	if(process_id == 0){
+
+		//Temp Block Handler from Terminating
+		spawnFlag = true; 
+		
+		//Add Process to Process Array
+		pidArray[idx]  = process_id; 
+	
+		//Release Block 
+		spawnFlag = false; 
+
+		//Index arg
+		char buffer_idx[10];
+		sprintf(buffer_idx, "%d", idx); 
+
+		//shmidSysTime arg
+		char buffer_sysTime[50]; 
+		sprintf(buffer_sysTime, "%d", shmidSysTime); 
+
+		//Call user file with child process
+		if(execl("./user", "user", buffer_idx, buffer_sysTime, (char*) NULL)){
+
+			perror("oss: ERROR: Failed to execl() child process "); 
+			exit(EXIT_FAILURE); 
+		}
+
+	exit(EXIT_SUCCESS); 
+
+	}
+}
+
+
+
