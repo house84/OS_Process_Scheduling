@@ -44,7 +44,7 @@ int main(int argc, char * argv[]){
 							exit(EXIT_FAILURE); 
 							break; 
 
-				defalut:	//Defalut Failure Exit
+				default:	//Defalut Failure Exit
 							fprintf(stderr, "Invalid Argument, see usage [-h]\n"); 
 							exit(EXIT_FAILURE); 
 				}
@@ -65,6 +65,21 @@ int main(int argc, char * argv[]){
 	//Create Shared Memory
 	createSharedMemory(); 
 	
+	//Set System Time
+	setSysTime(); 
+	
+	//=========== Add Program Logic =============
+	
+	int i; 
+	for(i = 0; i < 100; ++i){
+
+		//Increment System Time by NanoSeconds
+		incrementSysTime(100000000); 
+
+		//Show Timer
+		//showSysTime(); 
+	}
+
 	//Free Shared Memory
 	freeSharedMemory(); 
 
@@ -143,7 +158,7 @@ void signalHandler(int sig){
 
 
 //Display Usage
-void help(char *program){
+static void help(char *program){
 
   	printf("\n//=== %s Usage Page ===//\n", program);  
 	printf("\n%s [-h][-s t][-l f]\n", program); 
@@ -207,4 +222,34 @@ static void freeSharedMemory(){
 		perror("oss: ERROR: Failed to Desttory sysTimePtr, shmctl() "); 
 		exit(EXIT_FAILURE); 
 	}
+}
+
+
+//Set System Time
+static void setSysTime(){
+
+	sysTimePtr->seconds = 0; 
+	sysTimePtr->nanoSeconds = 0;
+}
+
+//Increment System Time
+static void incrementSysTime(int x){
+
+	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds + x; 
+
+	if(sysTimePtr->nanoSeconds == 1000000000 ){
+
+		sysTimePtr->nanoSeconds = 0;  
+		
+		sysTimePtr->seconds += 1; 
+	}	
+}
+
+//Show System Time
+static void showSysTime(){
+	
+	float nano = sysTimePtr->nanoSeconds;
+
+	printf("System Time (seconds)-> %03d:%09d\n",sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
+
 }

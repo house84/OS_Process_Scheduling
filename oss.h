@@ -14,11 +14,13 @@ enum state{ready, blocked, running};
 //Function Prototypes
 static void help(); 
 static void spawn();
-static void setTimer(); 
+static void setTimer();  
+static void setSysTime();
+static void showSysTime(); 
 static void signalHandler(); 
 static void freeSharedMemory(); 
+static void incrementSysTime(); 
 static void createSharedMemory();
-static void setTimer(); 
 
 key_t keySysTime;                       //Shm Key
 size_t memSize;                         //memSize for getshm()
