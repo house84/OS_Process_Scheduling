@@ -2,9 +2,7 @@
  * Author: Nick House
  * Program: user.c
  * Project: Process Scheduling
- */
-
-struct PCB pcb; 
+ */ 
 
 #include "user.h"
 
@@ -20,13 +18,25 @@ int main(int argc, char * argv[]){
 	//Initiate SHM
 	initSysTime();
 
-	pcb.cpu_Time = sysTimePtr->nanoSeconds; 
+	//Point pcb 
+	pcbPtr = &pcb;
+
+	//Initialize PCB Values
+	initPCB(pcbPtr, idx); 
+
+	//Add PCB to shared  pcbArr()
+	sysTimePtr->pcbArr[idx] = pcbPtr; 
+
+	fprintf(stderr,"IDX: %d SHMID: %d\n", idx, sysTimePtr->pcbArr[idx]->proc_id_Sim); 
+
+	//Test Setting Values to PCB
+	pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
 
 	printf("Test Program: %s\n", argv[0]); 
 	printf("Index: %d\n", atoi(argv[1])); 
 	printf("SHMID: %d\n", atoi(argv[2]));
-	printf("SHMID MSg: %d\n", atoi(argv[3]));
-	printf("PCB CPU Time: %d\n", pcb.cpu_Time); 
+	printf("SHMID MSG: %d\n", atoi(argv[3]));
+	printf("PCB CPU Time: %d\n", pcbPtr->cpu_Time); 
 
 	sleep(idx+1); 
 
@@ -68,4 +78,18 @@ static void freeSHM(){
 		exit(EXIT_FAILURE); 
 	}
 }
+
+
+//Initialize PCB Values
+static void initPCB(struct PCB *pcb, int idx){
+
+	pcb->proc_id = getpid(); 
+	pcb->proc_id_Sim = idx; 
+	pcb->cpu_Time = 0; 
+	pcb->system_Time = 0; 
+	pcb->wait_Time = 0; 
+	pcb->block_Time = 0; 
+	pcb->unblocked_Time = 0; 
+}
+
 

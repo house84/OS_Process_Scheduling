@@ -21,13 +21,11 @@ struct PCB{
   int wait_Time;             //Time spent waiting
   int block_Time;            //Time spent Blocked
   int unblocked_Time;        //Time spent UnBlocked
-  int proc_id_Sem;           //Simulated PID         
+  int proc_id_Sim;           //Simulated PID         
   pid_t proc_id;             //Process Id 
 
 }; 
 
-//Array of PCBs
-struct PCB *pcbArr[100]; 
 
 //Messaging for Sending
 struct msgBuf{
@@ -42,8 +40,9 @@ struct msgBuf{
 struct system_Time{
 
 	int seconds;
-	int nanoSeconds; 
+	int nanoSeconds;
+	struct PCB *pcbArr[100]; 
+
 };
  
-
 #endif

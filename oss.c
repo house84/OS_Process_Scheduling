@@ -20,7 +20,8 @@ int main(int argc, char * argv[]){
 	memset(logfile, '\0', sizeof(logfile)); 
 	strcpy(logfile, "logfile"); 
 	myTimer = 100; 
-
+	totalProc = 0;  
+	
 	//Parse input Args
 	int c = 0; 
 	
@@ -81,6 +82,7 @@ int main(int argc, char * argv[]){
 		
 		//Spawn Child Process
 		spawn(i); 
+		++totalProc; 
 
 		//Test Slowdown
 		sleep(1);
@@ -107,7 +109,18 @@ int main(int argc, char * argv[]){
 //		incrementSysTime(100000263); 
 //		showSysTime(); 
 //	}
+
+	fprintf(stderr,"HELLO this is the value of totalProc: %d\n", totalProc); 
 	
+	int thispid; 
+
+	//Test Shared Memory PCB Arr
+	for(i = 0; i < totalProc; ++i){
+	
+		thispid = sysTimePtr->pcbArr[i]->proc_id; 
+		fprintf(stderr, "PCB[%d] PID: %d\n", i, sysTimePtr->pcbArr[0]->proc_id); 
+	}
+
 	//Allow Processes to finish
 	while(wait(NULL) > 0){}
 
@@ -330,7 +343,7 @@ static void spawn(int idx){
 		
 		//Add Process to Process Array
 		pidArray[idx]  = process_id; 
-	
+
 		//Release Block 
 		spawnFlag = false; 
 
