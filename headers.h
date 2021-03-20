@@ -2,11 +2,11 @@
  * Author: Nick House
  * Project: Process Scheduling
  * Course: CS-4760 Operating Systems, Spring 2021
- * File Name: library.h
+ * File Name: headers.h
  */
 
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef HEADERS_H
+#define HEADERS_H
 
 #include <semaphore.h>
 #include <string.h>
@@ -28,18 +28,7 @@
 #include <sys/time.h>
 #include <sys/queue.h>
 #include <sys/wait.h>
-#include "messaging.h"
-#include "shared.h"
-#include "sysTime.h"
 
-//struct msgBuf buf; 
-
-//int shmidSysTime; 
-
-//struct system_Time *sysTimePtr;
-
-//struct PCB *pcb; 
-
-//int shmidMsg; 
+#include "shared.h" 
 
 #endif

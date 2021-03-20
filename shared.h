@@ -7,6 +7,11 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include "headers.h"
+
+//For usability: ready = 0, blocked = 1, running = 2, terminated = 3
+enum state{ready, blocked, running, terminated}; 
+
 //Process Control Block 
 struct PCB{
                              
@@ -21,12 +26,23 @@ struct PCB{
 
 }; 
 
+//Array of PCBs
+struct PCB *pcbArr[100]; 
+
 //Messaging for Sending
-struct message_Buffer{
+struct msgBuf{
 
-  long msg_type; 
-  char msg_text[100];
+  long mtype; 
+  char mtext[200];
 
+};
+
+
+//System Time
+struct system_Time{
+
+	int seconds;
+	int nanoSeconds; 
 };
  
 

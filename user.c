@@ -4,6 +4,8 @@
  * Project: Process Scheduling
  */
 
+struct PCB pcb; 
+
 #include "user.h"
 
 int main(int argc, char * argv[]){
@@ -16,12 +18,15 @@ int main(int argc, char * argv[]){
 	int idx = atoi(argv[1]); 
 
 	//Initiate SHM
-	initSysTime(); 
+	initSysTime();
+
+	pcb.cpu_Time = sysTimePtr->nanoSeconds; 
 
 	printf("Test Program: %s\n", argv[0]); 
 	printf("Index: %d\n", atoi(argv[1])); 
 	printf("SHMID: %d\n", atoi(argv[2]));
-	printf("SHMID MSg: %d\n", atoi(argv[3])); 
+	printf("SHMID MSg: %d\n", atoi(argv[3]));
+	printf("PCB CPU Time: %d\n", pcb.cpu_Time); 
 
 	sleep(idx+1); 
 

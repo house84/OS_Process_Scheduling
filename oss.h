@@ -7,10 +7,10 @@
 #ifndef OSS_H
 #define OSS_H
 
-#include "library.h"
+#include "headers.h"
 
 //For usability: ready = 0, blocked = 1, running = 2
-enum state{ready, blocked, running}; 
+//enum state{ready, blocked, running};
 
 
 //Function Prototypes
@@ -36,7 +36,8 @@ int shmidSysTime;
 
 struct msgBuf buf; 
 struct system_Time *sysTimePtr; 
-struct PCB *pcb; 
+struct PCB pcb; 
+
 
 pid_t pidArray[100];                    //Variable for Process PID's
 bool sigFlag;                           //Variable to pause termination

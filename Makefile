@@ -7,7 +7,7 @@ OBJ1 = oss.o
 TARGET2 = user
 OBJ2 = user.o
 
-HEADERS = library.h shared.h sysTime.h messaging.h oss.h user.h
+HEADERS = headers.h shared.h oss.h user.h
 
 .SUFFIXES: .c .o
 
