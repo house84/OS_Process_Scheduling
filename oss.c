@@ -90,14 +90,11 @@ int main(int argc, char * argv[]){
 
 	}
 
-	//Testing Timer
-	for(i = 0; i < 5; ++i){
-
-		incrementSysTime(100000000); 
-	}
 
 	//Test message Recieving From User
 	for(i = 1; i<3; ++i){
+
+		incrementSysTime(100000008); 
 
 		//msgrcv(msgID, message, sizeof(), address, wait)
 		msgrcv(shmidMsg, &buf, sizeof(buf.mtext), i, 0); 
@@ -107,6 +104,13 @@ int main(int argc, char * argv[]){
 	}
 	
 
+	//Testing Timer
+//	for(i = 0; i < 10; ++i){
+
+//		incrementSysTime(100000263); 
+//		showSysTime(); 
+//	}
+	
 	//Allow Processes to finish
 	while(wait(NULL) > 0){}
 
@@ -162,26 +166,24 @@ void signalHandler(int sig){
 	while(spawnFlag == true){}
 	
 	//Free Memory Resources
-	//freeSharedMemory();
-	
-	//Free Message Memory
-	//freeSharedMessage(); 
+	freeSharedMemory();
 	
 	if( sig == 3126 ) { exit(EXIT_SUCCESS); }
 
 	//Terminate Child Processes
-	//int i; 
-	//for( i = 0; i < totalProc; ++i({
-	//    
-	//    if(kill(pidArray[i], SIGKILL ) == -1 && errno != ERSCH ){
-	//    		
-	//        perror("oss: ERROR: Failed to Kill Processes "); 
-	//        exit(EXIT_FAILURE); 
-	//
-	//    }
+	int i; 
+	for( i = 0; i < totalProc; ++i){
+	    
+	    if(kill(pidArray[i], SIGKILL ) == -1 && errno != ESRCH ){
+	    		
+	        perror("oss: ERROR: Failed to Kill Processes "); 
+	        exit(EXIT_FAILURE); 
+	
+	    }
+	}
 	
 	//Destroy Potential Zombies
-	//while( wait(NULL) != -1 || errno == EINTR ); 
+	while( wait(NULL) != -1 || errno == EINTR ); 
 
 	exit(EXIT_SUCCESS); 
 }
@@ -292,9 +294,9 @@ static void incrementSysTime(int x){
 
 	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds + x; 
 
-	if(sysTimePtr->nanoSeconds == 1000000000 ){
+	if(sysTimePtr->nanoSeconds >= 1000000000 ){
 
-		sysTimePtr->nanoSeconds = 0;  
+		sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 100000000;  
 		
 		sysTimePtr->seconds += 1; 
 	}	
