@@ -108,17 +108,16 @@ int main(int argc, char * argv[]){
 
 //		incrementSysTime(100000263); 
 //		showSysTime(); 
-//	}
-
-	fprintf(stderr,"HELLO this is the value of totalProc: %d\n", totalProc); 
-	
-	int thispid; 
+//	} 
+	 
 
 	//Test Shared Memory PCB Arr
 	for(i = 0; i < totalProc; ++i){
-	
-		thispid = sysTimePtr->pcbArr[i]->proc_id; 
-		fprintf(stderr, "PCB[%d] PID: %d\n", i, sysTimePtr->pcbArr[0]->proc_id); 
+		
+
+		pid_t myID = sysTimePtr->pcbArr[i].proc_id;  
+		fprintf(stderr, "PCB[%d] PID: %d Index: %d\n", i, myID, sysTimePtr->pcbArr[i].proc_id_Sim);
+
 	}
 
 	//Allow Processes to finish

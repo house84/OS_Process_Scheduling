@@ -41,7 +41,7 @@ struct system_Time{
 
 	int seconds;
 	int nanoSeconds;
-	struct PCB *pcbArr[100]; 
+	struct PCB pcbArr[100]; 
 
 };
  

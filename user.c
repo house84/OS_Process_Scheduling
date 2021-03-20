@@ -18,25 +18,22 @@ int main(int argc, char * argv[]){
 	//Initiate SHM
 	initSysTime();
 
-	//Point pcb 
-	pcbPtr = &pcb;
-
 	//Initialize PCB Values
-	initPCB(pcbPtr, idx); 
-
-	//Add PCB to shared  pcbArr()
-	sysTimePtr->pcbArr[idx] = pcbPtr; 
-
-	fprintf(stderr,"IDX: %d SHMID: %d\n", idx, sysTimePtr->pcbArr[idx]->proc_id_Sim); 
+	initPCB(idx); 
+	
+	sysTimePtr->pcbArr[idx].proc_id_Sim = idx; 
+	
+	fprintf(stderr,"IDX: %d SHMID: %d\n", idx, idx); 
 
 	//Test Setting Values to PCB
-	pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
+	//pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
+	sysTimePtr->pcbArr[idx].cpu_Time = sysTimePtr->nanoSeconds; 
 
 	printf("Test Program: %s\n", argv[0]); 
 	printf("Index: %d\n", atoi(argv[1])); 
 	printf("SHMID: %d\n", atoi(argv[2]));
 	printf("SHMID MSG: %d\n", atoi(argv[3]));
-	printf("PCB CPU Time: %d\n", pcbPtr->cpu_Time); 
+	printf("PCB CPU Time: %d\n", sysTimePtr->pcbArr[idx].cpu_Time); 
 
 	sleep(idx+1); 
 
@@ -81,15 +78,15 @@ static void freeSHM(){
 
 
 //Initialize PCB Values
-static void initPCB(struct PCB *pcb, int idx){
+static void initPCB(int idx){
 
-	pcb->proc_id = getpid(); 
-	pcb->proc_id_Sim = idx; 
-	pcb->cpu_Time = 0; 
-	pcb->system_Time = 0; 
-	pcb->wait_Time = 0; 
-	pcb->block_Time = 0; 
-	pcb->unblocked_Time = 0; 
+	sysTimePtr->pcbArr[idx].proc_id = getpid(); 
+	sysTimePtr->pcbArr[idx].proc_id_Sim = idx; 
+	sysTimePtr->pcbArr[idx].cpu_Time = 0; 
+	sysTimePtr->pcbArr[idx].system_Time = 0; 
+	sysTimePtr->pcbArr[idx].wait_Time = 0; 
+	sysTimePtr->pcbArr[idx].block_Time = 0; 
+	sysTimePtr->pcbArr[idx].unblocked_Time = 0; 
 }
 
 
