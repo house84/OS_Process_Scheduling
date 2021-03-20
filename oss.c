@@ -5,10 +5,7 @@
  * File Name: oss.c
  */
 
-#include "library.h"
 #include "oss.h"
-#include "shared.h"
-#include "sysTime.h"
 
 int main(int argc, char * argv[]){
 	

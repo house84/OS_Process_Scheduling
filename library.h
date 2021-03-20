@@ -29,12 +29,17 @@
 #include <sys/queue.h>
 #include <sys/wait.h>
 #include "messaging.h"
+#include "shared.h"
+#include "sysTime.h"
 
-struct msgBuf buf; 
+//struct msgBuf buf; 
 
-int shmidSysTime; 
-struct system_Time *sysTimePtr; 
+//int shmidSysTime; 
 
-int shmidMsg; 
+//struct system_Time *sysTimePtr;
+
+//struct PCB *pcb; 
+
+//int shmidMsg; 
 
 #endif
