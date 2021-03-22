@@ -21,6 +21,7 @@ int main(int argc, char * argv[]){
 	strcpy(logfile, "logfile"); 
 	myTimer = 100; 
 	totalProc = 0;  
+//	bv_t bitVector; 
 	
 	//Parse input Args
 	int c = 0; 
@@ -68,7 +69,8 @@ int main(int argc, char * argv[]){
 	
 	//Set System Time
 	setSysTime(); 
-	
+
+
 	//=========== Add Program Logic =============
 	
 	int i; 
@@ -119,6 +121,26 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "PCB[%d] PID: %d Index: %d\n", i, myID, sysTimePtr->pcbArr[i].proc_id_Sim);
 
 	}
+
+
+	//Test bitVector
+	int index;
+	for(i = 0 ; i < procMax ; ++i){
+
+		index = getBitVectorPos(); 
+		setBitVectorVal(index); 
+		fprintf(stderr, "BitVector Pos: %d\n", index); 
+
+	}
+	
+	for(i = 0; i < procMax ; ++i){
+
+		unsetBitVectorVal(index); 
+		fprintf(stderr, "BitVector Pos: %d\n", index); 
+		--index; 
+	
+	}
+
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){}
@@ -370,5 +392,46 @@ static void spawn(int idx){
 	}
 }
 
+
+//Find Index of empty Bit Arr
+static int getBitVectorPos(){
+
+	unsigned int i = 1; 
+	int idx = 0; 
+
+	//Search bitVector R->L until 0 is found
+	while(( i & bitVector) && (idx < procMax)){
+
+		i <<= 1; 
+		++idx; 
+	}
+
+	if( idx < procMax ){
+
+		return idx; 
+	}
+
+	else{
+
+		return -1; 
+	}
+
+}
+
+
+//Set Bit Vector From Index 
+void setBitVectorVal(int idx){
+	
+	bitVector |= ( 1 << idx ); 
+
+}
+
+
+//Unset Bit Vector from index
+void unsetBitVectorVal(int idx){
+
+	bitVector |= ( 0 << idx); 
+
+}
 
 

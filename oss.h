@@ -12,14 +12,18 @@
 //For usability: ready = 0, blocked = 1, running = 2
 //enum state{ready, blocked, running};
 
+#define procMax 18
 
 //Function Prototypes
 static void help(); 
 static void spawn();
+void setBitVectorVal(); 
 static void setTimer();  
+void unsetBitVectorVal(); 
 static void setSysTime();
 static void showSysTime(); 
-static void signalHandler(); 
+static void signalHandler();
+static int  getBitVectorPos();
 static void freeSharedMemory(); 
 static void incrementSysTime(); 
 static void createSharedMemory();
@@ -38,7 +42,8 @@ struct msgBuf buf;
 struct system_Time *sysTimePtr; 
 struct PCB pcb; 
 
-
+typedef unsigned int bv_t;              //Bit Vector
+bv_t bitVector;                         //BV Variable
 pid_t pidArray[100];                    //Variable for Process PID's
 bool sigFlag;                           //Variable to pause termination
 bool spawnFlag;                         //Varialbe to signal forking process
