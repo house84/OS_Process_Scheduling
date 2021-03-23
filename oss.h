@@ -49,7 +49,7 @@ int shmidSysTime;                      //Shared Memory For System Time
 struct msgBuf buf;                     //Message Buffer
 struct system_Time *sysTimePtr;        //System Time Pointer
 //struct PCB pcb;                        //PCB 
-struct PCB *pcbArr[18];                //PCB Array for OSS
+//struct PCB *pcbArr[18];                //PCB Array for OSS
 
 typedef unsigned int bv_t;             //Bit Vector
 bv_t bitVector;                        //BV Variable
@@ -59,6 +59,7 @@ bool spawnFlag;                        //Varialbe to signal forking process
 
 int myTimer;                           //Timer Value
 int totalProc; 					       //Number of total procedures
+int concProc;                          //Number of Concurrent Processes
 char logfile[100];                     //Logfile Name
 FILE *logfilePtr;                      //Logfile Pointer
 int logLines;                          //Holds Number of lines in logfile

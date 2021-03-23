@@ -21,7 +21,7 @@ struct system_Time *sysTimePtr;   //Pointer to System Time
 struct msgBuf buf; 
 
 struct PCB pcb; 
-//struct PCB *pcbPtr; 
+struct PCB *pcbPtr; 
 
 
 #endif

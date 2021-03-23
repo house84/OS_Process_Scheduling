@@ -10,14 +10,16 @@ int main(int argc, char * argv[]){
 
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
-	shmidMsg = atoi(argv[3]); 
+	shmidMsg = atoi(argv[3]);
 
 	//Set index
 	int idx = atoi(argv[1]); 
 
+
 	//Initiate SHM
 	initSysTime();
 
+	fprintf(stderr,"IN USER\n"); 
 	//Initialize PCB Values
 	initPCB(idx); 
 	

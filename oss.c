@@ -79,10 +79,13 @@ int main(int argc, char * argv[]){
 	openLogfile(); 
 
 
+
 	//=========== Add Program Logic =============
 	
+
 	int i; 
-//	for(i = 0; i < 2; ++i){
+	int index; 
+	concProc = 0; 
 
 	while( i < 5 && stopProdTimer == false ){
 
@@ -93,15 +96,28 @@ int main(int argc, char * argv[]){
 		//showSysTime();
 		
 		//Spawn Child Process
-		spawn(i); 
+		index = getBitVectorPos(); 
+		
+		sysTimePtr->pcbArr[index] = pcb;  
+
+		spawn(index); 
 		++totalProc; 
+		++concProc; 
 
 		//Test Slowdown
 		sleep(1);
-		++i; 
+		++i;  
 
+		//Control Concurrent Proc
+		if(concProc >= 18){
+			 
+			 wait(NULL); 
+			 --concProc; 
+		}
 	}
 
+
+	//==========================================
 
 	//Test message Recieving From User
 	for(i = 1; i < totalProc; ++i){
@@ -283,7 +299,7 @@ static void setTimer2(int t){
 //Handler for Stopping Process Creation
 static void stopTimeHandler(){
 
-	fprintf(stderr, "3 Second Timer \n"); 
+//	fprintf(stderr, "3 Second Timer \n"); 
 	stopProdTimer = true;
 }
 
@@ -416,10 +432,10 @@ static void spawn(int idx){
 
 		//shmidMsg arg
 		char buffer_msgId[50];
-		sprintf(buffer_msgId, "%d", shmidMsg); 
+		sprintf(buffer_msgId, "%d", shmidMsg);
 
 		//Call user file with child process
-		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId, (char*) NULL)){
+		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId,(char*) NULL)){
 
 			perror("oss: ERROR: Failed to execl() child process "); 
 			exit(EXIT_FAILURE); 
@@ -445,6 +461,9 @@ static int getBitVectorPos(){
 	}
 
 	if( idx < procMax ){
+
+		//Set Bit Func
+		setBitVectorVal(idx); 
 
 		return idx; 
 	}

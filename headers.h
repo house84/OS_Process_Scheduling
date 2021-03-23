@@ -19,6 +19,7 @@
 #include <signal.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <ctype.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>

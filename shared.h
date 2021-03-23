@@ -25,8 +25,10 @@ struct PCB{
   pid_t proc_id;             //Process Id 
 
 }pcb; 
- 
-struct PCB *pcbPTR;          //PCB Ptr
+
+//struct PCB *pcbArr[18];      //Array for Running PCBs
+
+//struct PCB *pcbPTR;          //PCB Ptr
 
 //Messaging for Sending
 struct msgBuf{
@@ -42,7 +44,7 @@ struct system_Time{
 
 	int seconds;
 	int nanoSeconds;
-	struct PCB pcbArr[100]; 
+	struct PCB pcbArr[18]; 
 
 };
  
