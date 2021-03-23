@@ -24,8 +24,9 @@ struct PCB{
   int proc_id_Sim;           //Simulated PID         
   pid_t proc_id;             //Process Id 
 
-}; 
-
+}pcb; 
+ 
+struct PCB *pcbPTR;          //PCB Ptr
 
 //Messaging for Sending
 struct msgBuf{

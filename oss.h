@@ -15,49 +15,54 @@
 #define procMax 18
 
 //Function Prototypes
-static void help(); 
-static void spawn();
-void setBitVectorVal(); 
-static void setTimer();  
-void unsetBitVectorVal(); 
-static void setSysTime();
-static void showSysTime(); 
-static void signalHandler();
-static int  getBitVectorPos();
-static void freeSharedMemory(); 
-static void incrementSysTime(); 
-static void createSharedMemory();
+static void help();                    //Help Page
+static void spawn();                   //Spawn Child Process
+static void setTimer();                //Set initial Timer
+static void setSysTime();              //Set the System Time
+static void showSysTime();             //Display System Time
+static void openLogfile();             //Open Logfile
+static void closeLogfile();            //Close Logfile
+static void displayStats();            //Display Stats
+static void signalHandler();           //Handle Signal timer/ctrl+c
+static int  getBitVectorPos();         //Search bit vector for open idx
+static void freeSharedMemory();        //Release Shared Memory Resources
+static void incrementSysTime();        //Increment System time
+static void createSharedMemory();      //Allocate Shared Memory
 
-key_t keySysTime;                       //Shm Key
-size_t memSize;                         //memSize for getshm()
+void setBitVectorVal();                //Set BitVector used from idx 
+void unsetBitVectorVal();              //Clear Bitvector from idx
 
-key_t keyMsg;                           //Shm Key for Message Q
+key_t keySysTime;                      //Shm Key
+size_t memSize;                        //memSize for getshm()
 
-struct itimerval timer;                 //Set Timer
+key_t keyMsg;                          //Shm Key for Message Q
 
-int shmidMsg; 
-int shmidSysTime; 
+struct itimerval timer;                //Set Timer
 
-struct msgBuf buf; 
-struct system_Time *sysTimePtr; 
-struct PCB pcb; 
+int shmidMsg;                          //Shared Memory ID for Message
+int shmidSysTime;                      //Shared Memory For System Time
 
-typedef unsigned int bv_t;              //Bit Vector
-bv_t bitVector;                         //BV Variable
-pid_t pidArray[100];                    //Variable for Process PID's
-bool sigFlag;                           //Variable to pause termination
-bool spawnFlag;                         //Varialbe to signal forking process
+struct msgBuf buf;                     //Message Buffer
+struct system_Time *sysTimePtr;        //System Time Pointer
+//struct PCB pcb;                        //PCB 
+struct PCB *pcbArr[100];               //PCB Array for OSS
 
-int logLines;                           //Holds Number of lines in logfile
-int myTimer;                            //Timer Value
-int totalProc; 					        //Number of total procedures
-char logfile[100];                      //Logfile Name
-FILE *logfilePtr;                       //Logfile Pointer
-time_t t;                               //Hold Time
+typedef unsigned int bv_t;             //Bit Vector
+bv_t bitVector;                        //BV Variable
+pid_t pidArray[100];                   //Variable for Process PID's
+bool sigFlag;                          //Variable to pause termination
+bool spawnFlag;                        //Varialbe to signal forking process
+
+int myTimer;                           //Timer Value
+int totalProc; 					       //Number of total procedures
+char logfile[100];                     //Logfile Name
+FILE *logfilePtr;                      //Logfile Pointer
+int logLines;                          //Holds Number of lines in logfile
+time_t t;                              //Hold Time
 
 
 
-struct Queue{
+struct Queue{                          //Queue for Ready 
 
 	struct Node *front; 
 	struct Node *Rear; 
@@ -68,10 +73,10 @@ struct Queue{
 };
 
 
-struct Node{
+struct CPU{                            //Struct for CPU item
 
-  int fakePID;                      //Index for PCB
-  struct Node *next; 
+  int fakePID;                         //Index for next Process
+  struct CPU *next; 
 
 }; 
 

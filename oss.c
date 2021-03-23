@@ -70,6 +70,9 @@ int main(int argc, char * argv[]){
 	//Set System Time
 	setSysTime(); 
 
+	//Open logfile
+	openLogfile(); 
+
 
 	//=========== Add Program Logic =============
 	
@@ -146,14 +149,17 @@ int main(int argc, char * argv[]){
 	while(wait(NULL) > 0){}
 
 	//Free Shared Memory
-	freeSharedMemory(); 
+//	freeSharedMemory(); 
+
+	//Close logfile
+//	closeLogfile(); 
 
 	//Testing Output
 	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
 
-
-
+	//Clean up Resources
+	signalHandler(3126);
 
 	return 0; 
 
@@ -168,30 +174,34 @@ void signalHandler(int sig){
 
   	//openLogfile(); 
   
-  	//time(&t); 
+  	time(&t); 
   
   	//Check for Signal Type
   	if( sig == SIGINT ) {
 
 		fprintf(stderr, "\nProgram Terminated by User\n"); 
-		//fprintf(shmptr->logfilePtr, "\nTime: %sProgram Terminated by User\n", ctime(&t)); 
+		fprintf(logfilePtr, "\nTime: %sProgram Terminated by User\n", ctime(&t)); 
 	
   	}else if( sig == 3126 ){
 
 	  	fprintf(stderr, "\nAll Processes have finished\n"); 
-	  	//fprintf(shmptr->logfilePtr, "\nTime: %sAll Processes have finished\n", ctime(&t));
+	  	fprintf(logfilePtr, "\nTime: %sAll Processes have finished\n", ctime(&t));
 	
 	}else{
 
 	  	fprintf(stderr, "\nProgram Terminated due to Timer\n"); 
-		//fprintf(shmptr->logfilePtr, "\nTime: %sProgram Termintated due to Timer\n", ctime(&t)); 
+		//fprintf(logfilePtr, "\nTime: %sProgram Termintated due to Timer\n", ctime(&t)); 
 
 	}
 
 
 	//fprintf(shmptr->logfilePtr,"\n//****************** END FILE ENTRY ********************//\n\n"); 
 	
-	//closeLogfile(); 
+	//Display Stats
+	displayStats(); 
+	
+	//Close Logfile Ptr
+	closeLogfile(); 
 	
 	//Allow Potential Creating Processes to add PID to Array
 	while(spawnFlag == true){}
@@ -199,7 +209,9 @@ void signalHandler(int sig){
 	//Free Memory Resources
 	freeSharedMemory();
 	
+	//Exit Normally
 	if( sig == 3126 ) { exit(EXIT_SUCCESS); }
+
 
 	//Terminate Child Processes
 	int i; 
@@ -435,3 +447,43 @@ void unsetBitVectorVal(int idx){
 }
 
 
+//Open New Logfile
+static void openLogfile(){
+	
+	logfilePtr = fopen(logfile, "w"); 
+
+	if( logfilePtr == NULL ){
+
+		perror("oss: ERROR: Failed to Open logfile "); 
+		exit(EXIT_FAILURE); 
+	}
+
+	time(&t); 
+
+	fprintf(logfilePtr, "\n//========================= Log Opened ========================//\n"); 
+	fprintf(logfilePtr, "Time: %s", ctime(&t));
+	fprintf(logfilePtr, "//=============================================================//\n"); 
+
+}
+
+
+//Close Logfile
+static void closeLogfile(){
+
+	
+	fprintf(logfilePtr, "\n//========================= Log Closed ========================//\n"); 
+	fprintf(logfilePtr, "Time: %s", ctime(&t)); 
+	fprintf(logfilePtr, "//=============================================================//\n\n"); 
+	fclose(logfilePtr); 
+
+
+}
+
+
+//Display Stats/Print Stats
+static void displayStats(){
+
+	//Print to logs and Display
+	fprintf(stderr, "displayStats()\n"); 
+
+}
