@@ -64,6 +64,11 @@ int main(int argc, char * argv[]){
 	//Set timer
 	setTimer(myTimer); 
 
+
+	//Set 3 Second Timer
+	stopProdTimer = false; 
+	setTimer2(3); 
+
 	//Create Shared Memory
 	createSharedMemory(); 
 	
@@ -77,7 +82,9 @@ int main(int argc, char * argv[]){
 	//=========== Add Program Logic =============
 	
 	int i; 
-	for(i = 0; i < 2; ++i){
+//	for(i = 0; i < 2; ++i){
+
+	while( i < 5 && stopProdTimer == false ){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
@@ -91,12 +98,13 @@ int main(int argc, char * argv[]){
 
 		//Test Slowdown
 		sleep(1);
+		++i; 
 
 	}
 
 
 	//Test message Recieving From User
-	for(i = 1; i<3; ++i){
+	for(i = 1; i < totalProc; ++i){
 
 		incrementSysTime(100000008); 
 
@@ -117,47 +125,39 @@ int main(int argc, char * argv[]){
 	 
 
 	//Test Shared Memory PCB Arr
-	for(i = 0; i < totalProc; ++i){
+//	for(i = 0; i < totalProc; ++i){
 		
 
-		pid_t myID = sysTimePtr->pcbArr[i].proc_id;  
-		fprintf(stderr, "PCB[%d] PID: %d Index: %d\n", i, myID, sysTimePtr->pcbArr[i].proc_id_Sim);
+//		pid_t myID = sysTimePtr->pcbArr[i].proc_id;  
+//		fprintf(stderr, "PCB[%d] PID: %d Index: %d\n", i, myID, sysTimePtr->pcbArr[i].proc_id_Sim);
 
-	}
+//	}
 
 
 	//Test bitVector
-	int index;
-	for(i = 0 ; i < procMax ; ++i){
+//	int index;
+//	for(i = 0 ; i < procMax ; ++i){
 
-		index = getBitVectorPos(); 
-		setBitVectorVal(index); 
-		fprintf(stderr, "BitVector Pos: %d\n", index); 
+//		index = getBitVectorPos(); 
+//		setBitVectorVal(index); 
+//		fprintf(stderr, "BitVector Pos: %d\n", index); 
 
-	}
+//	}
 	
-	for(i = 0; i < procMax ; ++i){
+//	for(i = 0; i < procMax ; ++i){
 
-		unsetBitVectorVal(index); 
-		fprintf(stderr, "BitVector Pos: %d\n", index); 
-		--index; 
-	
-	}
+//		unsetBitVectorVal(index); 
+//		fprintf(stderr, "BitVector Pos: %d\n", index); 
+//		--index; 
+//	}
 
 
 	//Allow Processes to finish
-	while(wait(NULL) > 0){}
-
-	//Free Shared Memory
-//	freeSharedMemory(); 
-
-	//Close logfile
-//	closeLogfile(); 
+	while(wait(NULL) > 0){} 
 
 	//Testing Output
 	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
-
 	//Clean up Resources
 	signalHandler(3126);
 
@@ -259,6 +259,32 @@ static void setTimer(int t){
 		perror("oss: ERROR: Failed to set timer setitimer() ");
 		exit(EXIT_FAILURE);
 	}
+}
+
+
+//Start Stop Produce Timer
+static void setTimer2(int t){
+
+	signal(SIGALRM, stopTimeHandler); 
+
+	timer.it_value.tv_sec = t; 
+	timer.it_value.tv_usec = 0; 
+	timer.it_interval.tv_sec = 0; 
+	timer.it_interval.tv_usec = 0; 
+
+	if(setitimer(ITIMER_REAL, &timer, NULL) == -1){
+
+		perror("oss: ERROR: Failed to set timer setitimer() ");
+		exit(EXIT_FAILURE);
+	}
+}
+
+
+//Handler for Stopping Process Creation
+static void stopTimeHandler(){
+
+	fprintf(stderr, "3 Second Timer \n"); 
+	stopProdTimer = true;
 }
 
 
