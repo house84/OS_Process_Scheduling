@@ -78,7 +78,8 @@ int main(int argc, char * argv[]){
 	//Open logfile
 	openLogfile(); 
 
-
+	//Initialize Queue
+	GQue = initQueue(); 
 
 	//=========== Add Program Logic =============
 	
@@ -126,12 +127,26 @@ int main(int argc, char * argv[]){
 		}
 		
 		//Slowdown for testing
-	//	sleep(1);
+		sleep(1);
 	}
 
 
 	//==========================================
 
+	//Test Enqueue
+	enqueue(0); 
+	enqueue(1); 
+
+	//Test Print Q
+	printQ(); 
+
+	//Test Dequeue
+	dequeue(); 
+	dequeue();
+
+	printQ(); 
+
+	
 	//Test message Recieving From User
 	for(i = 1; i < totalProc; ++i){
 
@@ -542,5 +557,98 @@ static void displayStats(){
 
 	//Print to logs and Display
 	fprintf(stderr, "displayStats()\n"); 
+
+}
+
+
+//Initialize Queue
+//struct Queue * initQueue(int pid){
+struct Queue * initQueue(){
+
+	struct Queue *que = (struct Queue*)malloc(sizeof(struct Queue));
+
+	fprintf(stderr, "IN INITQUEUE\n"); 
+
+
+	//Initialize Null Front and Rear Nodes
+	que->head = NULL; 
+	que->tail = NULL; 
+
+	que->maxSize = procMax; 
+	que->currSize = 0;  
+
+	return que; 
+
+}
+
+
+//Enqueue Process to Queue
+static void enqueue(int idx){
+
+	//Testing
+	fprintf(stderr, "ENQUEU\n"); 
+
+	struct p_Node *newNode = (struct p_Node*)malloc(sizeof(struct p_Node));  
+
+	newNode->fakePID = idx; 
+	newNode->next = NULL; 
+
+	++GQue->currSize; 
+
+	//Check if Empty
+	if( GQue->head == NULL && GQue->tail == NULL ){
+
+		GQue->head = newNode; 
+		GQue->tail = newNode; 
+
+		return; 
+	}
+
+	//Else add Node to End of Que
+	GQue->tail->next = newNode; 
+	GQue->tail = newNode; 
+  
+}
+
+
+//Dequeue Process from Queue
+static void dequeue(){
+
+	//Testing
+	fprintf(stderr, "Dequeue\n"); 	
+
+	//Check if Que is empty
+	if( GQue->head == NULL ){ return; }
+
+	struct p_Node *newNode = GQue->head; 
+
+	--GQue->currSize; 
+
+	//Make next node the head
+	GQue->head = GQue->head->next; 
+
+	//Check if Que is Now Empty
+	if( GQue->head == NULL ){ GQue->tail = NULL; }
+
+}
+
+
+//Print The Queue for Testing
+static void printQ(){
+
+	//Test
+	fprintf(stderr, "Print Q\n"); 
+	
+	struct p_Node *newNode = GQue->head; 
+
+	fprintf(stderr, "QUEUE Sizez: %d -> ", GQue->currSize);
+
+	while(newNode != NULL){
+
+		fprintf(stderr, "%d ", newNode->fakePID); 
+		newNode = newNode->next; 
+	}
+
+	fprintf(stderr,"\n"); 
 
 }

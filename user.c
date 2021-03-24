@@ -31,15 +31,15 @@ int main(int argc, char * argv[]){
 	//pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
 	sysTimePtr->pcbArr[idx].cpu_Time = sysTimePtr->nanoSeconds; 
 
-	printf("Test Program: %s\n", argv[0]); 
-	printf("Index: %d\n", atoi(argv[1])); 
-	printf("SHMID: %d\n", atoi(argv[2]));
-	printf("SHMID MSG: %d\n", atoi(argv[3]));
-	printf("PCB CPU Time: %d\n", sysTimePtr->pcbArr[idx].cpu_Time); 
+	fprintf(stderr, "Test Program: %s\n", argv[0]); 
+	fprintf(stderr, "Index: %d\n", atoi(argv[1])); 
+	fprintf(stderr, "SHMID: %d\n", atoi(argv[2]));
+	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
+	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbArr[idx].cpu_Time); 
 
-	sleep(idx+1); 
+//	sleep(idx+1); 
 
-	fprintf(stderr,"Time: %03d:%09d\n", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
+//	fprintf(stderr,"Time: %03d:%09d\n", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
 
 	//Test Sending Message
 	buf.mtype = idx+1;                        //mtype is "address"

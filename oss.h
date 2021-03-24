@@ -17,6 +17,9 @@
 //Function Prototypes
 static void help();                    //Help Page
 static void spawn();                   //Spawn Child Process
+static void printQ();                  //Print Queue
+static void enqueue();                 //Add Child to Queue
+static void dequeue();                 //Remove Child from Queue
 static void setTimer();                //Set initial Timer
 static void setTimer2();               //Set 3 Second Timer
 static void setSysTime();              //Set the System Time
@@ -25,7 +28,7 @@ static void openLogfile();             //Open Logfile
 static void closeLogfile();            //Close Logfile
 static void displayStats();            //Display Stats
 static void signalHandler();           //Handle Signal timer/ctrl+c
-static void stopTimeHandler();          //Stop Producing Timer Handler
+static void stopTimeHandler();         //Stop Producing Timer Handler
 static int  getBitVectorPos();         //Search bit vector for open idx
 static void freeSharedMemory();        //Release Shared Memory Resources
 static void incrementSysTime();        //Increment System time
@@ -69,19 +72,21 @@ time_t t;                              //Hold Time
 
 struct Queue{                          //Queue for Ready 
 
-	struct Node *front; 
-	struct Node *Rear; 
+	struct p_Node *head; 
+	struct p_Node *tail; 
 	int	currSize;
-	int maxSize; 
-	int pid; 
+	int maxSize;  
 
 };
 
+struct Queue *initQueue();             //Create Queue
 
-struct CPU{                            //Struct for CPU item
+struct Queue *GQue;                      //Variable for Queue
+
+struct p_Node{                         //Struct for items in Que
 
   int fakePID;                         //Index for next Process
-  struct CPU *next; 
+  struct p_Node *next; 
 
 }; 
 
