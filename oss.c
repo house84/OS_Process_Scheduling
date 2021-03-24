@@ -86,34 +86,47 @@ int main(int argc, char * argv[]){
 	int i; 
 	int index; 
 	concProc = 0; 
-
-	while( i < 5 && stopProdTimer == false ){
+	
+	//For Real 
+	//whlie(totalProc < 100 && stopProdTimer == false){ 
+	
+	//Testing While
+	while( totalProc < 5 && stopProdTimer == false ){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
-
-		//Show Timer
-		//showSysTime();
+		
+		//Try Running Process in CPU
+		//Check runQueue
+		//
+		//allocateCPU()
 		
 		//Spawn Child Process
 		index = getBitVectorPos(); 
 		
 		sysTimePtr->pcbArr[index] = pcb;  
 
-		spawn(index); 
-		++totalProc; 
-		++concProc; 
+		//check for Finished Processes
+		int status; 
+		pid_t user_id = waitpid(-1, &status, WNOHANG); 
 
-		//Test Slowdown
-		sleep(1);
-		++i;  
-
-		//Control Concurrent Proc
-		if(concProc >= 18){
-			 
-			 wait(NULL); 
-			 --concProc; 
+		if(user_id > 0 ){
+ 			
+			--concProc; 
 		}
+
+		//Test Printing Concurrent Process
+		fprintf(stderr, "concProc = %d\n", concProc); 
+
+		if( concProc < 19 ){
+
+			spawn(index); 
+			++totalProc; 
+			++concProc; 
+		}
+		
+		//Slowdown for testing
+	//	sleep(1);
 	}
 
 
@@ -167,10 +180,9 @@ int main(int argc, char * argv[]){
 //		--index; 
 //	}
 
-
 	//Allow Processes to finish
 	while(wait(NULL) > 0){} 
-
+	
 	//Testing Output
 	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	

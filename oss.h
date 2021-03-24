@@ -48,7 +48,7 @@ int shmidSysTime;                      //Shared Memory For System Time
 
 struct msgBuf buf;                     //Message Buffer
 struct system_Time *sysTimePtr;        //System Time Pointer
-//struct PCB pcb;                        //PCB 
+struct PCB cpu;                        //PCB 
 //struct PCB *pcbArr[18];                //PCB Array for OSS
 
 typedef unsigned int bv_t;             //Bit Vector
