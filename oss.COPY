@@ -81,8 +81,7 @@ int main(int argc, char * argv[]){
 	GQue = initQueue(); 
 
 	//Initialize CPU Node
-	//struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
-	CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
+	struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
 
 	//=========== Add Program Logic =============
 	
@@ -106,10 +105,7 @@ int main(int argc, char * argv[]){
 			index = getBitVectorPos(); 
 			spawn(index); 
 			++totalProc; 
-			++concProc;
-
-			//Testing
-			enqueue(index); 
+			++concProc; 
 		}
 		
 		
@@ -118,10 +114,10 @@ int main(int argc, char * argv[]){
 		//
 		//
 		//Try Running Process in CPU
-		
 		//Check runQueue
-		allocateCPU();
-			
+		//allocateCPU();
+		
+		
 		
 		sysTimePtr->pcbTable[index] = pcb;  
 
@@ -666,57 +662,3 @@ static void printQ(){
 	fprintf(stderr,"\n"); 
 
 }
-
-
-//Check Blocked Que for Ready Proc
-static void checkBlockedQue(){
-
-
-}
-
-
-//Display Stytem Time
-const char * getSysTime(){
-	
-	
-	char *sTime; 
-	asprintf(&sTime, "%04d:%09d", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
-	
-	return sTime; 
-}
-
-
-//Put Ready Process into CPU
-static void allocateCPU(){
-	
-	//Check for runnable Processes
-	if(GQue->currSize == 0){ return; }
-	
-	//Dequeue Process
-	CPU_Node = dequeue(); 
-	
-	//Check Node
-	if(CPU_Node == NULL){
-
-		fprintf(stderr,"Que Head Empty\n"); 
-		return; 
-	}
-
-	buf.mtype = CPU_Node->fakePID+1;
-	strcpy(buf.mtext, "Running"); 
-
-	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
-
-		perror("oss: ERROR: Failed to Send Running to User msgsnd() "); 
-		exit(EXIT_FAILURE); 
-	}
-
-	fprintf(stderr, "Time: %s PID: %d |||| SCHEDULED\n", getSysTime(), CPU_Node->fakePID); 
-
-	enqueue(CPU_Node->fakePID); 
-
-	//Need to wait for message back that 
-	
-}
-
-//struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 

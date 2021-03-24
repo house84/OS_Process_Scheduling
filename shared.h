@@ -44,7 +44,7 @@ struct system_Time{
 
 	int seconds;
 	int nanoSeconds;
-	struct PCB pcbArr[18]; 
+	struct PCB pcbTable[18]; 
 
 };
  

@@ -19,17 +19,21 @@ static void help();                    //Help Page
 static void spawn();                   //Spawn Child Process
 static void printQ();                  //Print Queue
 static void enqueue();                 //Add Child to Queue
-static void dequeue();                 //Remove Child from Queue
+//static void dequeue();                 //Remove Child from Queue
 static void setTimer();                //Set initial Timer
 static void setTimer2();               //Set 3 Second Timer
 static void setSysTime();              //Set the System Time
+const char *getSysTime();              //Return formatted System Time
+struct p_Node * dequeue();             //Remove Head
 static void showSysTime();             //Display System Time
+static void allocateCPU();             //Try to Put Process in CPU
 static void openLogfile();             //Open Logfile
 static void closeLogfile();            //Close Logfile
 static void displayStats();            //Display Stats
 static void signalHandler();           //Handle Signal timer/ctrl+c
 static void stopTimeHandler();         //Stop Producing Timer Handler
 static int  getBitVectorPos();         //Search bit vector for open idx
+static void checkBlockedQue();         //Search Blocked Que for Freed Proc
 static void freeSharedMemory();        //Release Shared Memory Resources
 static void incrementSysTime();        //Increment System time
 static void createSharedMemory();      //Allocate Shared Memory
@@ -53,6 +57,8 @@ struct msgBuf buf;                     //Message Buffer
 struct system_Time *sysTimePtr;        //System Time Pointer
 struct PCB cpu;                        //PCB 
 //struct PCB *pcbArr[18];                //PCB Array for OSS
+struct p_Node *CPU_Node;               //Node to Hold CPU Process
+
 
 typedef unsigned int bv_t;             //Bit Vector
 bv_t bitVector;                        //BV Variable
