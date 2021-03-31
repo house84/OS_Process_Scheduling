@@ -165,7 +165,7 @@ int main(int argc, char * argv[]){
 		incrementSysTime(100000008); 
 
 		//msgrcv(msgID, message, sizeof(), address, wait)
-		msgrcv(shmidMsg, &buf, sizeof(buf.mtext), i, 0); 
+		msgrcv(shmidMsg, &buf, sizeof(buf.mtext), 0, 0); 
 
 		fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
 
@@ -363,7 +363,7 @@ static void createSharedMemory(){
 	sysTimePtr = (struct system_Time *) shmat(shmidSysTime, NULL, 0); 
 
 
-	//=== Messaging Q Memory
+	//=== Messaging to Send to User
 	if((keyMsg = ftok("oss.c", 'a')) == -1){
 		
 		perror("oss: ERROR: Failed to generate keyMsg, ftok() ");
@@ -375,7 +375,19 @@ static void createSharedMemory(){
 		perror("oss: ERROR: Failed to generate shmidMsg, msgget() "); 
 		exit(EXIT_FAILURE); 
 	}
+	
+	//=== Message to Recieve From User
+	if((keyMsg2 = ftok("user.c", 'a')) == -1){
 
+		perror("oss: ERROR: Failed to generate keyMsg2, ftok() ");
+		exit(EXIT_FAILURE); 
+	}
+
+	if((shmidMsgRcv = msgget(keyMsg2, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+
+		perror("oss: ERROR: Failed to generate shmidMsg, msgget() ");
+		exit(EXIT_FAILURE); 
+	}
 }
 
 
@@ -703,7 +715,7 @@ static void allocateCPU(){
 	}
 
 	buf.mtype = CPU_Node->fakePID+1;
-	strcpy(buf.mtext, "Running"); 
+	strcpy(buf.mtext, "Run"); 
 
 	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
 

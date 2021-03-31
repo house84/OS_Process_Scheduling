@@ -42,23 +42,43 @@ int main(int argc, char * argv[]){
 //	fprintf(stderr,"Time: %03d:%09d\n", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
 
 	//Test Sending Message
-	buf.mtype = idx+1;                        //mtype is "address"
+//	buf.mtype = idx+1;                        //mtype is "address"
 	//buf.mtext = "This is Test from User";   //Message
-	strcpy(buf.mtext, "This is test from User"); 
+//	strcpy(buf.mtext, "This is test from User"); 
 
 	//msgsnd(msgID, message, sizeof(), wait)
-	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
+//	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
 
-		perror("user: ERROR: failed to msgsnd() "); 
-		exit(EXIT_FAILURE); 
-	}
-	
+//		perror("user: ERROR: failed to msgsnd() "); 
+//		exit(EXIT_FAILURE); 
+//	}
+
+	char *message; 
+	strcpy(message, "running"); 
+
+	sendMessage(message, idx+1); 
+
 	//Free Memory
 	freeSHM(); 
 	
 	exit(EXIT_SUCCESS); 
 
 }
+
+
+static void sendMessage(char* msg, int idx){
+
+	buf.mtype = idx; 
+	strcpy(buf.mtext, msg);
+
+	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
+
+		perror("user: ERROR: Failed to msgsnd() ");
+		exit(EXIT_FAILURE); 
+	}
+}
+
+
 
 //Initialize Shared Memory for System Time
 static void initSysTime(){
