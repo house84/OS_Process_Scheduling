@@ -160,12 +160,12 @@ int main(int argc, char * argv[]){
 
 	
 	//Test message Recieving From User
-	for(i = 1; i < totalProc; ++i){
+	for(i = 0 ; i < totalProc; ++i){
 
 		incrementSysTime(100000008); 
 
 		//msgrcv(msgID, message, sizeof(), address, wait)
-		msgrcv(shmidMsg, &buf, sizeof(buf.mtext), i, 0); 
+		msgrcv(shmidMsgRcv, &buf, sizeof(buf.mtext), 0, 0); 
 
 		fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
 
@@ -363,7 +363,7 @@ static void createSharedMemory(){
 	sysTimePtr = (struct system_Time *) shmat(shmidSysTime, NULL, 0); 
 
 
-	//=== Messaging Q Memory
+	//=== Messaging to Send to User
 	if((keyMsg = ftok("oss.c", 'a')) == -1){
 		
 		perror("oss: ERROR: Failed to generate keyMsg, ftok() ");
@@ -375,7 +375,19 @@ static void createSharedMemory(){
 		perror("oss: ERROR: Failed to generate shmidMsg, msgget() "); 
 		exit(EXIT_FAILURE); 
 	}
+	
+	//=== Message to Recieve From User
+	if((keyMsg2 = ftok("user.c", 'a')) == -1){
 
+		perror("oss: ERROR: Failed to generate keyMsg2, ftok() ");
+		exit(EXIT_FAILURE); 
+	}
+
+	if((shmidMsgRcv = msgget(keyMsg2, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+
+		perror("oss: ERROR: Failed to generate shmidMsg, msgget() ");
+		exit(EXIT_FAILURE); 
+	}
 }
 
 
@@ -401,6 +413,12 @@ static void freeSharedMemory(){
 	if(msgctl(shmidMsg, IPC_RMID, NULL) == -1){
 
 		perror("oss: ERROR: Failed to Destroy shmidMsg, msgctl() "); 
+		exit(EXIT_FAILURE); 
+	}
+
+	if(msgctl(shmidMsgRcv, IPC_RMID, NULL) == -1){
+
+		perror("oss: ERROR: Failed to Destroy shmidMsgRcb, msgctl() ");
 		exit(EXIT_FAILURE); 
 	}
 }
@@ -473,8 +491,12 @@ static void spawn(int idx){
 		char buffer_msgId[50];
 		sprintf(buffer_msgId, "%d", shmidMsg);
 
+		//shmidMsgRcv arg
+		char buffer_msgId2[50];
+		sprintf(buffer_msgId2, "%d", shmidMsgRcv); 
+
 		//Call user file with child process
-		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId,(char*) NULL)){
+		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId,buffer_msgId2, (char*) NULL)){
 
 			perror("oss: ERROR: Failed to execl() child process "); 
 			exit(EXIT_FAILURE); 
@@ -702,8 +724,12 @@ static void allocateCPU(){
 		return; 
 	}
 
+	//Testing
+	fprintf(stderr, "In Allocate CPU, PID: %d\n", CPU_Node->fakePID+1); 
+
 	buf.mtype = CPU_Node->fakePID+1;
-	strcpy(buf.mtext, "Running"); 
+//	buf.mtype = 1; 
+	strcpy(buf.mtext, "Run"); 
 
 	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
 

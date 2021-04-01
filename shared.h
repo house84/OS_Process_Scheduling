@@ -22,7 +22,8 @@ struct PCB{
   int block_Time;            //Time spent Blocked
   int unblocked_Time;        //Time spent UnBlocked
   int proc_id_Sim;           //Simulated PID         
-  pid_t proc_id;             //Process Id 
+  pid_t proc_id;             //Process Id
+  int msgID;                 //Message Id
 
 }pcb; 
 

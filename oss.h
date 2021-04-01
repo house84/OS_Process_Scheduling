@@ -43,19 +43,21 @@ void unsetBitVectorVal();              //Clear Bitvector from idx
 
 key_t keySysTime;                      //Shm Key
 size_t memSize;                        //memSize for getshm()
-
 key_t keyMsg;                          //Shm Key for Message Q
+key_t keyMsg2;                         //Shm key for Message 2
 
 struct itimerval timer;                //Set Timer
 
 bool stopProdTimer;                    //Produce or not Bool
 
-int shmidMsg;                          //Shared Memory ID for Message
+int shmidMsg;                          //Send Message to User
+int shmidMsgRcv;                       //Recieve Message from User
 int shmidSysTime;                      //Shared Memory For System Time
 
 struct msgBuf buf;                     //Message Buffer
 struct system_Time *sysTimePtr;        //System Time Pointer
 struct PCB cpu;                        //PCB 
+struct PCB blockedQ[18];               //Blocked Queue
 //struct PCB *pcbArr[18];                //PCB Array for OSS
 struct p_Node *CPU_Node;               //Node to Hold CPU Process
 
