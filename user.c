@@ -11,21 +11,24 @@ int main(int argc, char * argv[]){
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
+	shmidMsgSend = atoi(argv[4]); 
 
 	//Set index
 	int idx = atoi(argv[1]); 
+	int mID = idx+1; 
 
+	msgrcv(shmidMsg, &buf, sizeof(buf.mtext), idx, 0); 
 
 	//Initiate SHM
 	initSysTime();
 
-	fprintf(stderr,"IN USER\n"); 
+	fprintf(stderr,"IN USER MID: %d\n", mID); 
 	//Initialize PCB Values
 	initPCB(idx); 
 	
 	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
 	
-	fprintf(stderr,"IDX: %d SHMID: %d\n", idx, idx); 
+	//fprintf(stderr,"IDX: %d SHMID: %d\n", idx, idx); 
 
 	//Test Setting Values to PCB
 	//pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
@@ -43,20 +46,19 @@ int main(int argc, char * argv[]){
 
 	//Test Sending Message
 //	buf.mtype = idx+1;                        //mtype is "address"
-	//buf.mtext = "This is Test from User";   //Message
 //	strcpy(buf.mtext, "This is test from User"); 
 
 	//msgsnd(msgID, message, sizeof(), wait)
-//	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
+//	if((msgsnd(shmidMsgSend, &buf, strlen(buf.mtext)+1, 0)) == -1){
 
 //		perror("user: ERROR: failed to msgsnd() "); 
 //		exit(EXIT_FAILURE); 
 //	}
 
-	char *message; 
-	strcpy(message, "running"); 
+//	char *message; 
+//	strcpy(message, "running"); 
 
-	sendMessage(message, idx+1); 
+	sendMessage(shmidMsgSend, running, mID); 
 
 	//Free Memory
 	freeSHM(); 
@@ -66,12 +68,13 @@ int main(int argc, char * argv[]){
 }
 
 
-static void sendMessage(char* msg, int idx){
+//Message_t ready = 0 , blocked = 1, running = 2, terminated = 3
+static void sendMessage(int msgid, int msg_T, int idx){
 
 	buf.mtype = idx; 
-	strcpy(buf.mtext, msg);
+	strcpy(buf.mtext, "Test");
 
-	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
+	if((msgsnd(msgid, &buf, strlen(buf.mtext)+1, 0)) == -1){
 
 		perror("user: ERROR: Failed to msgsnd() ");
 		exit(EXIT_FAILURE); 
@@ -109,6 +112,7 @@ static void initPCB(int idx){
 	sysTimePtr->pcbTable[idx].wait_Time = 0; 
 	sysTimePtr->pcbTable[idx].block_Time = 0; 
 	sysTimePtr->pcbTable[idx].unblocked_Time = 0; 
+	sysTimePtr->pcbTable[idx].msgID = idx+1; 
 }
 
 
