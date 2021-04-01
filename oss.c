@@ -95,7 +95,7 @@ int main(int argc, char * argv[]){
 	//whlie(totalProc < 100 && stopProdTimer == false){ 
 	
 	//Testing While
-	while( totalProc < 5 && stopProdTimer == false ){
+	while( totalProc < 1 && stopProdTimer == false ){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
@@ -145,19 +145,6 @@ int main(int argc, char * argv[]){
 
 	//==========================================
 
-	//Test Enqueue
-//	enqueue(0); 
-//	enqueue(1); 
-
-	//Test Print Q
-//	printQ(); 
-
-	//Test Dequeue
-//	dequeue(); 
-//	dequeue();
-
-//	printQ(); 
-
 	
 	//Test message Recieving From User
 	for(i = 0 ; i < totalProc; ++i){
@@ -165,47 +152,12 @@ int main(int argc, char * argv[]){
 		incrementSysTime(100000008); 
 
 		//msgrcv(msgID, message, sizeof(), address, wait)
-		msgrcv(shmidMsgRcv, &buf, sizeof(buf.mtext), 0, 0); 
+	//	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext), 0, 0); 
 
-		fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
+	//	fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
 
 	}
 	
-
-	//Testing Timer
-//	for(i = 0; i < 10; ++i){
-
-//		incrementSysTime(100000263); 
-//		showSysTime(); 
-//	} 
-	 
-
-	//Test Shared Memory PCB Arr
-//	for(i = 0; i < totalProc; ++i){
-		
-
-//		pid_t myID = sysTimePtr->pcbArr[i].proc_id;  
-//		fprintf(stderr, "PCB[%d] PID: %d Index: %d\n", i, myID, sysTimePtr->pcbArr[i].proc_id_Sim);
-
-//	}
-
-
-	//Test bitVector
-//	int index;
-//	for(i = 0 ; i < procMax ; ++i){
-
-//		index = getBitVectorPos(); 
-//		setBitVectorVal(index); 
-//		fprintf(stderr, "BitVector Pos: %d\n", index); 
-
-//	}
-	
-//	for(i = 0; i < procMax ; ++i){
-
-//		unsetBitVectorVal(index); 
-//		fprintf(stderr, "BitVector Pos: %d\n", index); 
-//		--index; 
-//	}
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){} 
@@ -725,13 +677,15 @@ static void allocateCPU(){
 	}
 
 	//Testing
-	fprintf(stderr, "In Allocate CPU, PID: %d\n", CPU_Node->fakePID+1); 
+	fprintf(stderr, "In Allocate CPU, mID: %d\n", CPU_Node->fakePID+1); 
 
-	buf.mtype = CPU_Node->fakePID+1;
-//	buf.mtype = 1; 
-	strcpy(buf.mtext, "Run"); 
+	int mID = CPU_Node->fakePID+1; 
 
-	if((msgsnd(shmidMsg, &buf, strlen(buf.mtext)+1, 0)) == -1){
+//	bufS.mtype = msgID; //CPU_Node->fakePID+1;
+	bufS.mtype = mID; 
+	strcpy(bufS.mtext, "Run"); 
+
+	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
 
 		perror("oss: ERROR: Failed to Send Running to User msgsnd() "); 
 		exit(EXIT_FAILURE); 
@@ -742,7 +696,7 @@ static void allocateCPU(){
 	enqueue(CPU_Node->fakePID); 
 
 	//Need to wait for message back that 
-	
+	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext)+1, mID, 0); 
 }
 
 //struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 

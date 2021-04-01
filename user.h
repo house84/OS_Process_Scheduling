@@ -20,7 +20,7 @@ int shmidMsgSend;                 //Message TO Oss
 
 struct system_Time *sysTimePtr;   //Pointer to System Time
 
-struct msgBuf buf; 
+//struct msgBuf buf; 
 
 struct PCB pcb; 
 struct PCB *pcbPtr; 
