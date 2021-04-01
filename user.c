@@ -8,6 +8,7 @@
 
 int main(int argc, char * argv[]){
 
+	
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
@@ -17,12 +18,12 @@ int main(int argc, char * argv[]){
 	int idx = atoi(argv[1]); 
 	int mID = idx+1; 
 
-	msgrcv(shmidMsg, &buf, sizeof(buf.mtext), idx, 0); 
+	fprintf(stderr,"IN USER IDX: %d mID: %d\n", idx, mID); 
+	msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
 
 	//Initiate SHM
 	initSysTime();
 
-	fprintf(stderr,"IN USER MID: %d\n", mID); 
 	//Initialize PCB Values
 	initPCB(idx); 
 	
@@ -71,10 +72,10 @@ int main(int argc, char * argv[]){
 //Message_t ready = 0 , blocked = 1, running = 2, terminated = 3
 static void sendMessage(int msgid, int msg_T, int idx){
 
-	buf.mtype = idx; 
-	strcpy(buf.mtext, "Test");
+	bufS.mtype = idx; 
+	strcpy(bufS.mtext, "Test");
 
-	if((msgsnd(msgid, &buf, strlen(buf.mtext)+1, 0)) == -1){
+	if((msgsnd(msgid, &bufS, strlen(bufS.mtext)+1, IPC_NOWAIT)) == -1){
 
 		perror("user: ERROR: Failed to msgsnd() ");
 		exit(EXIT_FAILURE); 

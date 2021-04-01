@@ -54,7 +54,8 @@ int shmidMsg;                          //Send Message to User
 int shmidMsgRcv;                       //Recieve Message from User
 int shmidSysTime;                      //Shared Memory For System Time
 
-struct msgBuf buf;                     //Message Buffer
+//struct msgBuf bufS;                    //Message Send
+//struct msgBuf bufR;                    //Message Recieve 
 struct system_Time *sysTimePtr;        //System Time Pointer
 struct PCB cpu;                        //PCB 
 struct PCB blockedQ[18];               //Blocked Queue
