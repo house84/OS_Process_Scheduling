@@ -8,7 +8,6 @@
 
 int main(int argc, char * argv[]){
 
-	
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
@@ -29,10 +28,6 @@ int main(int argc, char * argv[]){
 	
 	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
 	
-	//fprintf(stderr,"IDX: %d SHMID: %d\n", idx, idx); 
-
-	//Test Setting Values to PCB
-	//pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
 	sysTimePtr->pcbTable[idx].cpu_Time = sysTimePtr->nanoSeconds; 
 
 	fprintf(stderr, "Test Program: %s\n", argv[0]); 
@@ -41,24 +36,7 @@ int main(int argc, char * argv[]){
 	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
 	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
 
-//	sleep(idx+1); 
-
-//	fprintf(stderr,"Time: %03d:%09d\n", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
-
-	//Test Sending Message
-//	buf.mtype = idx+1;                        //mtype is "address"
-//	strcpy(buf.mtext, "This is test from User"); 
-
-	//msgsnd(msgID, message, sizeof(), wait)
-//	if((msgsnd(shmidMsgSend, &buf, strlen(buf.mtext)+1, 0)) == -1){
-
-//		perror("user: ERROR: failed to msgsnd() "); 
-//		exit(EXIT_FAILURE); 
-//	}
-
-//	char *message; 
-//	strcpy(message, "running"); 
-
+	//Send Message Back to OSS
 	sendMessage(shmidMsgSend, running, mID); 
 
 	//Free Memory
@@ -81,7 +59,6 @@ static void sendMessage(int msgid, int msg_T, int idx){
 		exit(EXIT_FAILURE); 
 	}
 }
-
 
 
 //Initialize Shared Memory for System Time
@@ -113,7 +90,8 @@ static void initPCB(int idx){
 	sysTimePtr->pcbTable[idx].wait_Time = 0; 
 	sysTimePtr->pcbTable[idx].block_Time = 0; 
 	sysTimePtr->pcbTable[idx].unblocked_Time = 0; 
-	sysTimePtr->pcbTable[idx].msgID = idx+1; 
+	sysTimePtr->pcbTable[idx].msgID = idx+1;
+
 }
 
 
