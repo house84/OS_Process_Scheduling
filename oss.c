@@ -95,20 +95,23 @@ int main(int argc, char * argv[]){
 	//whlie(totalProc < 100 && stopProdTimer == false){ 
 	
 	//Testing While
-	while( totalProc < 100 && stopProdTimer == false ){
+//	while( totalProc < 10 && stopProdTimer == false ){ 
+	while(true){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
 		
-		//Spawn Child Process
-		if( concProc < 1){//19 ){
+		//Spawn Child Process //Set to 20 for testing
+		if( concProc < 19 && totalProc < 20 && stopProdTimer == false){
 
 			index = getBitVectorPos(); 
 			spawn(index); 
 			++totalProc; 
 			++concProc;
+			
+			fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
 
-			//Testing
+			//Add to RunQ
 			enqueue(index); 
 		}
 		
@@ -127,17 +130,22 @@ int main(int argc, char * argv[]){
 
 		//check for Finished Processes
 		int status; 
+	//	pid_t user_id = 0; 
+		
 		pid_t user_id = waitpid(-1, &status, WNOHANG); 
 
 		if(user_id > 0 ){
  			
-			--concProc; 
+			//fprintf(stderr,"waitPid user_id: %d\n", user_id); 
+			--concProc;
 		}
 
-		//Test Printing Concurrent Process
-//		fprintf(stderr, "concProc = %d\n", concProc); 
-
+		//Break Loop clean up memory
+		if((totalProc == 100 || stopProdTimer == true) && concProc == 0){
 		
+			break; 
+		}
+
 		//Slowdown for testing
 	//	sleep(1);
 	}
@@ -443,6 +451,7 @@ static void spawn(int idx){
 		char buffer_msgId[50];
 		sprintf(buffer_msgId, "%d", shmidMsg);
 
+	bool run = true; 
 		//shmidMsgRcv arg
 		char buffer_msgId2[50];
 		sprintf(buffer_msgId2, "%d", shmidMsgRcv); 
@@ -493,15 +502,13 @@ static int getBitVectorPos(){
 void setBitVectorVal(int idx){
 	
 	bitVector |= ( 1 << idx ); 
-
 }
 
 
 //Unset Bit Vector from index
-void unsetBitVectorVal(int idx){
+void unsetBitVectorVal(int idx){ 
 
-	bitVector |= ( 0 << idx); 
-
+	bitVector &= ~( 1 << idx ); 
 }
 
 
