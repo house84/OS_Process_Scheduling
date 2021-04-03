@@ -95,13 +95,13 @@ int main(int argc, char * argv[]){
 	//whlie(totalProc < 100 && stopProdTimer == false){ 
 	
 	//Testing While
-	while( totalProc < 1 && stopProdTimer == false ){
+	while( totalProc < 100 && stopProdTimer == false ){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
 		
 		//Spawn Child Process
-		if( concProc < 19 ){
+		if( concProc < 1){//19 ){
 
 			index = getBitVectorPos(); 
 			spawn(index); 
@@ -139,7 +139,7 @@ int main(int argc, char * argv[]){
 
 		
 		//Slowdown for testing
-		sleep(1);
+	//	sleep(1);
 	}
 
 
@@ -699,15 +699,25 @@ static void allocateCPU(){
 	}
 
 	//Print Update from CPU 
-	fprintf(stderr, "OSS: Time: %s PID: %d |||| Scheduled\n", getSysTime(), CPU_Node->fakePID); 
+	fprintf(stderr, "OSS: Time: %s PID: %d |||| Sent to CPU\n", getSysTime(), CPU_Node->fakePID); 
 
-	enqueue(CPU_Node->fakePID); 
 
 	//Need to wait for message back that 
 	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext)+1, mID, 0);
 
+	
 	//Display Message
 	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
+
+	if( strcmp(bufR.mtext, "terminated") == 0){
+
+		fprintf(stderr," TERMINATED\n");
+		unsetBitVectorVal(CPU_Node->fakePID); 
+		return; 
+	}
+	
+	//Add Process Back to Queue
+	enqueue(CPU_Node->fakePID); 
 }
 
 //struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 

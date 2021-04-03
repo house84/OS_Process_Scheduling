@@ -10,7 +10,7 @@
 #include "headers.h"
 
 //For usability: ready = 0, blocked = 1, running = 2, terminated = 3
-enum state{ready, blocked, running, terminated}; 
+enum state{ready, blocked, terminated}; 
 
 //Process Control Block 
 struct PCB{
@@ -20,7 +20,7 @@ struct PCB{
   int system_Time;           //Time spent in System
   int wait_Time;             //Time spent waiting
   int block_Time;            //Time spent Blocked
-  int unblocked_Time;        //Time spent UnBlocked
+  int sprint_Time;           //Recent Run time in CPU
   int proc_id_Sim;           //Simulated PID         
   pid_t proc_id;             //Process Id
   int msgID;                 //Message Id
