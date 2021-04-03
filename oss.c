@@ -21,6 +21,7 @@ int main(int argc, char * argv[]){
 	strcpy(logfile, "logfile"); 
 	myTimer = 100; 
 	totalProc = 0;  
+	srand(time(NULL)); 
 //	bv_t bitVector; 
 	
 	//Parse input Args
@@ -102,17 +103,20 @@ int main(int argc, char * argv[]){
 		incrementSysTime(100000000); 
 		
 		//Spawn Child Process //Set to 20 for testing
-		if( concProc < 19 && totalProc < 20 && stopProdTimer == false){
+		if( concProc < 12 && totalProc < 100 && stopProdTimer == false){
 
 			index = getBitVectorPos(); 
-			spawn(index); 
-			++totalProc; 
-			++concProc;
+			if(index != -1) { 
+				
+				spawn(index); 
+				++totalProc; 
+				++concProc;
 			
-			fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
+				fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
 
-			//Add to RunQ
-			enqueue(index); 
+				//Add to RunQ
+				enqueue(index);
+			}
 		}
 		
 		
@@ -140,31 +144,27 @@ int main(int argc, char * argv[]){
 			--concProc;
 		}
 
+	//	if(concProc > 1){
+	//		wait(NULL);
+	//		--concProc;
+	//	}
+
 		//Break Loop clean up memory
 		if((totalProc == 100 || stopProdTimer == true) && concProc == 0){
 		
 			break; 
 		}
 
+		if( totalProc %18  == 0 ){
+
 		//Slowdown for testing
-	//	sleep(1);
+			//sleep(rand()%3);
+			sleep(1); 
+		}
 	}
 
 
 	//==========================================
-
-	
-	//Test message Recieving From User
-	for(i = 0 ; i < totalProc; ++i){
-
-		incrementSysTime(100000008); 
-
-		//msgrcv(msgID, message, sizeof(), address, wait)
-	//	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext), 0, 0); 
-
-	//	fprintf(stderr, "Num: %d Msg: \"%s\"\n", buf.mtype, buf.mtext); 
-
-	}
 	
 
 	//Allow Processes to finish
@@ -398,7 +398,8 @@ static void incrementSysTime(int x){
 
 	if(sysTimePtr->nanoSeconds >= 1000000000 ){
 
-		sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 100000000;  
+	//	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 100000000;  
+		sysTimePtr->nanoSeconds = 0;  
 		
 		sysTimePtr->seconds += 1; 
 	}	
@@ -700,8 +701,9 @@ static void allocateCPU(){
 	strcpy(bufS.mtext, "Run"); 
 
 	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
+//	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, 0)) == -1){
 
-		perror("oss: ERROR: Failed to Send Running to User msgsnd() "); 
+		perror("oss: ERROR: Failed to Send Msg to User msgsnd() "); 
 		exit(EXIT_FAILURE); 
 	}
 
