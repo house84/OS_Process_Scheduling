@@ -77,7 +77,10 @@ static void sendMessage(int msgid, int idx){
 
 	//Get Type of message
 	int messageT = getMessageType(); 
-	 
+	
+	//Test output
+	//fprintf(stderr, "USER: SendMessage() Message TYPE: %d\n", messageT) ;
+
 	if(messageT != ready){
 		
 		int rand = getRandTime(); 
