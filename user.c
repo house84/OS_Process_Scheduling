@@ -8,7 +8,8 @@
 
 int main(int argc, char * argv[]){
 
-	
+	srand(time(NULL)); 
+
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
@@ -16,10 +17,10 @@ int main(int argc, char * argv[]){
 
 	//Set index
 	int idx = atoi(argv[1]); 
-	int mID = idx+1; 
+	int mID = idx+1;
+	run = true; 
 
 	fprintf(stderr,"IN USER IDX: %d mID: %d\n", idx, mID); 
-	msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
 
 	//Initiate SHM
 	initSysTime();
@@ -29,10 +30,6 @@ int main(int argc, char * argv[]){
 	
 	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
 	
-	//fprintf(stderr,"IDX: %d SHMID: %d\n", idx, idx); 
-
-	//Test Setting Values to PCB
-	//pcbPtr->cpu_Time = sysTimePtr->nanoSeconds; 
 	sysTimePtr->pcbTable[idx].cpu_Time = sysTimePtr->nanoSeconds; 
 
 	fprintf(stderr, "Test Program: %s\n", argv[0]); 
@@ -41,25 +38,15 @@ int main(int argc, char * argv[]){
 	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
 	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
 
-//	sleep(idx+1); 
+	int i; 
+	while(run == true){
 
-//	fprintf(stderr,"Time: %03d:%09d\n", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
-
-	//Test Sending Message
-//	buf.mtype = idx+1;                        //mtype is "address"
-//	strcpy(buf.mtext, "This is test from User"); 
-
-	//msgsnd(msgID, message, sizeof(), wait)
-//	if((msgsnd(shmidMsgSend, &buf, strlen(buf.mtext)+1, 0)) == -1){
-
-//		perror("user: ERROR: failed to msgsnd() "); 
-//		exit(EXIT_FAILURE); 
-//	}
-
-//	char *message; 
-//	strcpy(message, "running"); 
-
-	sendMessage(shmidMsgSend, running, mID); 
+		//Recienve Message to Run from CPU
+		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
+	
+		//Send Message Back to OSS
+		sendMessage(shmidMsgSend, mID); 
+	}
 
 	//Free Memory
 	freeSHM(); 
@@ -69,11 +56,56 @@ int main(int argc, char * argv[]){
 }
 
 
-//Message_t ready = 0 , blocked = 1, running = 2, terminated = 3
-static void sendMessage(int msgid, int msg_T, int idx){
+//Decide to block run or Terminate
+static int getMessageType(){
+
+	return (rand() % 3) ; 
+
+}
+
+//Decide how long to spend in quantum 10ms
+static int getRandTime(){
+
+	return (rand()%10) + 1; 
+
+}
+
+//Message_t ready = 0 , blocked = 1, terminated = 3
+static void sendMessage(int msgid, int idx){
 
 	bufS.mtype = idx; 
-	strcpy(bufS.mtext, "Test");
+
+	//Get Type of message
+	int messageT = getMessageType(); 
+	 
+	if(messageT != ready){
+		
+		int rand = getRandTime(); 
+		sysTimePtr->pcbTable[idx].sprint_Time = rand; 
+
+		sysTimePtr->pcbTable[idx].cpu_Time += rand; 
+	}
+	else{
+
+		sysTimePtr->pcbTable[idx].sprint_Time = 10; 
+
+		sysTimePtr->pcbTable[idx].proc_id += 10; 
+	}
+	
+	if(messageT == ready){
+
+		strcpy(bufS.mtext, "ready");
+	}
+	else if( messageT == blocked ){
+
+		strcpy(bufS.mtext, "blocked"); 
+	}
+	else {
+
+		strcpy(bufS.mtext, "terminated");
+		run = false; 
+	}
+
 
 	if((msgsnd(msgid, &bufS, strlen(bufS.mtext)+1, IPC_NOWAIT)) == -1){
 
@@ -81,7 +113,6 @@ static void sendMessage(int msgid, int msg_T, int idx){
 		exit(EXIT_FAILURE); 
 	}
 }
-
 
 
 //Initialize Shared Memory for System Time
@@ -112,8 +143,9 @@ static void initPCB(int idx){
 	sysTimePtr->pcbTable[idx].system_Time = 0; 
 	sysTimePtr->pcbTable[idx].wait_Time = 0; 
 	sysTimePtr->pcbTable[idx].block_Time = 0; 
-	sysTimePtr->pcbTable[idx].unblocked_Time = 0; 
-	sysTimePtr->pcbTable[idx].msgID = idx+1; 
+	sysTimePtr->pcbTable[idx].sprint_Time = 0; 
+	sysTimePtr->pcbTable[idx].msgID = idx+1;
+
 }
 
 

@@ -95,13 +95,13 @@ int main(int argc, char * argv[]){
 	//whlie(totalProc < 100 && stopProdTimer == false){ 
 	
 	//Testing While
-	while( totalProc < 1 && stopProdTimer == false ){
+	while( totalProc < 100 && stopProdTimer == false ){
 
 		//Increment System Time by NanoSeconds
 		incrementSysTime(100000000); 
 		
 		//Spawn Child Process
-		if( concProc < 19 ){
+		if( concProc < 1){//19 ){
 
 			index = getBitVectorPos(); 
 			spawn(index); 
@@ -139,7 +139,7 @@ int main(int argc, char * argv[]){
 
 		
 		//Slowdown for testing
-		sleep(1);
+	//	sleep(1);
 	}
 
 
@@ -553,7 +553,7 @@ struct Queue * initQueue(){
 
 	struct Queue *que = (struct Queue*)malloc(sizeof(struct Queue));
 
-	fprintf(stderr, "IN INITQUEUE\n"); 
+	//fprintf(stderr, "IN INITQUEUE\n"); 
 
 
 	//Initialize Null Front and Rear Nodes
@@ -572,12 +572,16 @@ struct Queue * initQueue(){
 static void enqueue(int idx){
 
 	//Testing
-	fprintf(stderr, "ENQUEU\n"); 
+	fprintf(stderr, "ENQUEU index: %d\n", idx); 
 
 	struct p_Node *newNode = (struct p_Node*)malloc(sizeof(struct p_Node));  
+	
 
 	newNode->fakePID = idx; 
 	newNode->next = NULL; 
+
+	//Test Print
+	fprintf(stderr, "OSS: Time: %s PID: %d |||| Added to Queue[%d]\n", getSysTime(), newNode->fakePID, GQue->currSize); 
 
 	++GQue->currSize; 
 
@@ -601,7 +605,7 @@ static void enqueue(int idx){
 struct p_Node * dequeue(){
 
 	//Testing
-	fprintf(stderr, "Dequeue\n"); 	
+	//fprintf(stderr, "Dequeue\n"); 	
 
 	//Check if Que is empty
 	if( GQue->head == NULL ){ return NULL; }
@@ -615,6 +619,9 @@ struct p_Node * dequeue(){
 
 	//Check if Que is Now Empty
 	if( GQue->head == NULL ){ GQue->tail = NULL; }
+
+	//Test Print
+	fprintf(stderr, "OSS: Time: %s PID: %d |||| Removed from Queue\n", getSysTime(), newNode->fakePID); 
 
 	return newNode; 
 
@@ -691,12 +698,26 @@ static void allocateCPU(){
 		exit(EXIT_FAILURE); 
 	}
 
-	fprintf(stderr, "Time: %s PID: %d |||| SCHEDULED\n", getSysTime(), CPU_Node->fakePID); 
+	//Print Update from CPU 
+	fprintf(stderr, "OSS: Time: %s PID: %d |||| Sent to CPU\n", getSysTime(), CPU_Node->fakePID); 
 
-	enqueue(CPU_Node->fakePID); 
 
 	//Need to wait for message back that 
-	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext)+1, mID, 0); 
+	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext)+1, mID, 0);
+
+	
+	//Display Message
+	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
+
+	if( strcmp(bufR.mtext, "terminated") == 0){
+
+		fprintf(stderr," TERMINATED\n");
+		unsetBitVectorVal(CPU_Node->fakePID); 
+		return; 
+	}
+	
+	//Add Process Back to Queue
+	enqueue(CPU_Node->fakePID); 
 }
 
 //struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
