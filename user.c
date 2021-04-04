@@ -14,6 +14,7 @@ int main(int argc, char * argv[]){
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
 	shmidMsgSend = atoi(argv[4]); 
+	shmidMsg3 = atoi(argv[5]); 
 
 	//Set index
 	int idx = atoi(argv[1]); 
@@ -39,11 +40,19 @@ int main(int argc, char * argv[]){
 	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
 
 	int i; 
+	
+	buf3.mtype = mID;
+	strcpy(buf3.mtext, ""); 
+
+	msgsnd(shmidMsg3, &buf3, sizeof(buf3.mtext), 0); 
+
 	while(run == true){
 
+		fprintf(stderr, "user: mID: %d Wating for OSS\n", mID); 
 		//Recienve Message to Run from CPU
 		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
 	
+		
 		//Send Message Back to OSS
 		sendMessage(shmidMsgSend, mID); 
 	}
@@ -109,8 +118,11 @@ static void sendMessage(int msgid, int idx){
 		run = false; 
 	}
 
+	//Message Sent 
+	fprintf(stderr, "user: Sending msg to OSS mID: %d\n", idx); 
 
-	if((msgsnd(msgid, &bufS, strlen(bufS.mtext)+1, IPC_NOWAIT)) == -1){
+//	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
+	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext), 0)) == -1){
 
 		perror("user: ERROR: Failed to msgsnd() ");
 		exit(EXIT_FAILURE); 

@@ -19,6 +19,7 @@ static int getMessageType();      //Return if Ready, blocked or Terminate
 int shmidSysTime;                 //Shm System Time
 int shmidMsg;                     //Message From OSS
 int shmidMsgSend;                 //Message TO Oss
+int shmidMsg3;                    //User Initialized
 bool run;                         //Continue Process
 
 struct system_Time *sysTimePtr;   //Pointer to System Time

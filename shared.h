@@ -41,7 +41,8 @@ struct msgBuf{
 };
 
 struct msgBuf bufS;
-struct msgBuf bufR; 
+struct msgBuf bufR;
+struct msgBuf buf3; 
 
 //System Time
 struct system_Time{

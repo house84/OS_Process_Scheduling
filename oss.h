@@ -43,8 +43,9 @@ void unsetBitVectorVal();              //Clear Bitvector from idx
 
 key_t keySysTime;                      //Shm Key
 size_t memSize;                        //memSize for getshm()
-key_t keyMsg;                          //Shm Key for Message Q
+key_t keyMsg;                          //Shm Key for Message 1
 key_t keyMsg2;                         //Shm key for Message 2
+key_t keyMsg3;                         //Shm key for Message 3
 
 struct itimerval timer;                //Set Timer
 
@@ -52,6 +53,7 @@ bool stopProdTimer;                    //Produce or not Bool
 
 int shmidMsg;                          //Send Message to User
 int shmidMsgRcv;                       //Recieve Message from User
+int shmidMsg3;                         //Message for Initialize User
 int shmidSysTime;                      //Shared Memory For System Time
 
 //struct msgBuf bufS;                    //Message Send

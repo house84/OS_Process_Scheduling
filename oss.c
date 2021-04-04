@@ -67,7 +67,8 @@ int main(int argc, char * argv[]){
 
 	//Set 3 Second Timer
 	stopProdTimer = false; 
-	setTimer2(3); 
+	//setTimer2(3); 
+	setTimer2(100); 
 
 	//Create Shared Memory
 	createSharedMemory(); 
@@ -113,6 +114,13 @@ int main(int argc, char * argv[]){
 				++concProc;
 			
 				fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
+				
+				//Allow User to initialize
+				if(msgrcv(shmidMsg3, &buf3, sizeof(buf3.mtext), index+1, 0) == -1){
+
+					perror("OSS: ERROR: Failed to RCV Message from user msgrcv() ");
+					exit(EXIT_FAILURE); 
+				}
 
 				//Add to RunQ
 				enqueue(index);
@@ -130,7 +138,7 @@ int main(int argc, char * argv[]){
 		allocateCPU();
 			
 		
-		sysTimePtr->pcbTable[index] = pcb;  
+	//	sysTimePtr->pcbTable[index] = pcb;  
 
 		//check for Finished Processes
 		int status; 
@@ -298,7 +306,7 @@ static void setTimer2(int t){
 //Handler for Stopping Process Creation
 static void stopTimeHandler(){
 
-//	fprintf(stderr, "3 Second Timer \n"); 
+	fprintf(stderr, "3 Second Timer \n"); 
 	stopProdTimer = true;
 }
 
@@ -336,7 +344,7 @@ static void createSharedMemory(){
 		exit(EXIT_FAILURE); 
 	}
 	
-	//=== Message to Recieve From User
+	//=== Message to Receive From User
 	if((keyMsg2 = ftok("user.c", 'a')) == -1){
 
 		perror("oss: ERROR: Failed to generate keyMsg2, ftok() ");
@@ -345,9 +353,23 @@ static void createSharedMemory(){
 
 	if((shmidMsgRcv = msgget(keyMsg2, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
 
-		perror("oss: ERROR: Failed to generate shmidMsg, msgget() ");
+		perror("oss: ERROR: Failed to generate shmidMsgRcv, msgget() ");
 		exit(EXIT_FAILURE); 
 	}
+
+	//=== Message to Receive Initialized from User
+	if((keyMsg3 = ftok("user.h", 'a')) == -1){
+
+		perror("oss: ERROR: Failed to generate keyMsg3, ftok() "); 
+		exit(EXIT_FAILURE); 
+	}
+
+	if((shmidMsg3 = msgget(keyMsg3, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+
+		perror("oss: ERROR: Failed to generate shmidMsg3, msgget() ");
+		exit(EXIT_FAILURE); 
+	}
+
 }
 
 
@@ -378,7 +400,13 @@ static void freeSharedMemory(){
 
 	if(msgctl(shmidMsgRcv, IPC_RMID, NULL) == -1){
 
-		perror("oss: ERROR: Failed to Destroy shmidMsgRcb, msgctl() ");
+		perror("oss: ERROR: Failed to Destroy shmidMsgRcv, msgctl() ");
+		exit(EXIT_FAILURE); 
+	}
+
+	if(msgctl(shmidMsg3, IPC_RMID, NULL) == -1){
+
+		perror("oss: ERROR: Failed to Destroy shmidMsg3, msgctl() "); 
 		exit(EXIT_FAILURE); 
 	}
 }
@@ -452,13 +480,18 @@ static void spawn(int idx){
 		char buffer_msgId[50];
 		sprintf(buffer_msgId, "%d", shmidMsg);
 
-	bool run = true; 
+
+	//	bool run = true; 
 		//shmidMsgRcv arg
 		char buffer_msgId2[50];
 		sprintf(buffer_msgId2, "%d", shmidMsgRcv); 
+		
+		//shmidMsg3 arg
+		char buffer_msgId3[50];
+		sprintf(buffer_msgId3, "%d", shmidMsg3); 
 
 		//Call user file with child process
-		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId,buffer_msgId2, (char*) NULL)){
+		if(execl("./user", "user", buffer_idx, buffer_sysTime, buffer_msgId,buffer_msgId2, buffer_msgId3, (char*) NULL)){
 
 			perror("oss: ERROR: Failed to execl() child process "); 
 			exit(EXIT_FAILURE); 
@@ -700,11 +733,26 @@ static void allocateCPU(){
 	bufS.mtype = mID; 
 	strcpy(bufS.mtext, "Run"); 
 
-	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
+//	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
 //	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, 0)) == -1){
+	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext), 0)) == -1 ){
+		
+	//	bool err = true; 
 
-		perror("oss: ERROR: Failed to Send Msg to User msgsnd() "); 
-		exit(EXIT_FAILURE); 
+	//	if( errno != EINTR){
+
+	//		if(	msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, 0) > -1){
+				
+	//			err = false; 
+	//		}	
+	//	}
+		
+//		if(err == true){
+
+			fprintf(stderr, "OSS: FAILED::: mID: %d\n", mID);  
+			perror("oss: ERROR: Failed to Send Msg to User msgsnd() "); 
+			exit(EXIT_FAILURE); 
+//		}
 	}
 
 	//Print Update from CPU 
@@ -712,7 +760,7 @@ static void allocateCPU(){
 
 
 	//Need to wait for message back that 
-	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext)+1, mID, 0);
+	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext), mID, 0);
 
 	
 	//Display Message
