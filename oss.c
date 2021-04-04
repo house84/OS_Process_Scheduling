@@ -351,7 +351,7 @@ static void createSharedMemory(){
 		exit(EXIT_FAILURE); 
 	}
 
-	if((shmidMsgRcv = msgget(keyMsg2, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
+	if((shmidMsg2 = msgget(keyMsg2, IPC_CREAT|S_IRUSR|S_IWUSR)) == -1){
 
 		perror("oss: ERROR: Failed to generate shmidMsgRcv, msgget() ");
 		exit(EXIT_FAILURE); 
@@ -398,7 +398,7 @@ static void freeSharedMemory(){
 		exit(EXIT_FAILURE); 
 	}
 
-	if(msgctl(shmidMsgRcv, IPC_RMID, NULL) == -1){
+	if(msgctl(shmidMsg2, IPC_RMID, NULL) == -1){
 
 		perror("oss: ERROR: Failed to Destroy shmidMsgRcv, msgctl() ");
 		exit(EXIT_FAILURE); 
@@ -483,7 +483,7 @@ static void spawn(int idx){
 		//bool run = true; 
 		//shmidMsgRcv arg
 		char buffer_msgId2[50];
-		sprintf(buffer_msgId2, "%d", shmidMsgRcv); 
+		sprintf(buffer_msgId2, "%d", shmidMsg2); 
 		
 		//shmidMsg3 arg
 		char buffer_msgId3[50];
@@ -688,17 +688,8 @@ static void printQ(){
 
 }
 
-
-//Check Blocked Que for Ready Proc
-static void checkBlockedQue(){
-
-
-}
-
-
 //Display Stytem Time
 const char * getSysTime(){
-	
 	
 	char *sTime; 
 	asprintf(&sTime, "%04d:%09d", sysTimePtr->seconds, sysTimePtr->nanoSeconds); 
@@ -728,30 +719,14 @@ static void allocateCPU(){
 
 	int mID = CPU_Node->fakePID+1; 
 
-//	bufS.mtype = msgID; //CPU_Node->fakePID+1;
 	bufS.mtype = mID; 
 	strcpy(bufS.mtext, "Run"); 
 
-//	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
-//	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, 0)) == -1){
 	if((msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext), 0)) == -1 ){
-		
-	//	bool err = true; 
 
-	//	if( errno != EINTR){
-
-	//		if(	msgsnd(shmidMsg, &bufS, sizeof(bufS.mtext)+1, 0) > -1){
-				
-	//			err = false; 
-	//		}	
-	//	}
-		
-//		if(err == true){
-
-			fprintf(stderr, "OSS: FAILED::: mID: %d\n", mID);  
-			perror("oss: ERROR: Failed to Send Msg to User msgsnd() "); 
-			exit(EXIT_FAILURE); 
-//		}
+		fprintf(stderr, "OSS: FAILED::: mID: %d\n", mID);  
+		perror("oss: ERROR: Failed to Send Msg to User msgsnd() "); 
+		exit(EXIT_FAILURE); 
 	}
 
 	//Print Update from CPU 
@@ -759,7 +734,7 @@ static void allocateCPU(){
 
 
 	//Need to wait for message back that 
-	msgrcv(shmidMsgRcv, &bufR, sizeof(bufR.mtext), mID, 0);
+	msgrcv(shmidMsg2, &bufR, sizeof(bufR.mtext), mID, 0);
 
 	
 	//Display Message
@@ -776,4 +751,31 @@ static void allocateCPU(){
 	enqueue(CPU_Node->fakePID); 
 }
 
-//struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
+
+//Initialize BlockedQ
+static void initBlockedQ(){
+
+	int i = 0; 
+
+	for(i = 0; i < 18; ++i){
+
+		blockedQ[i] = 0; 
+	}
+
+}
+
+
+//Check Blocked Que for Ready Proc
+static void checkBlockedQ(){
+
+	int i;
+	for(i = 0; i < 18; ++i){
+
+		if( blockedQ[i]== -1 ){
+
+			enqueue(i);
+			blockedQ[i] = 0; 
+		}
+
+	}
+}

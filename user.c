@@ -13,7 +13,7 @@ int main(int argc, char * argv[]){
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
 	shmidMsg = atoi(argv[3]);
-	shmidMsgSend = atoi(argv[4]); 
+	shmidMsg2 = atoi(argv[4]); 
 	shmidMsg3 = atoi(argv[5]); 
 
 	//Set index
@@ -54,7 +54,7 @@ int main(int argc, char * argv[]){
 	
 		
 		//Send Message Back to OSS
-		sendMessage(shmidMsgSend, mID); 
+		sendMessage(shmidMsg2, mID); 
 	}
 
 	//Free Memory
@@ -66,9 +66,9 @@ int main(int argc, char * argv[]){
 
 
 //Decide to block run or Terminate
-static int getMessageType(){
+static int getMessageType(int idx){
 
-	return (rand() % 3) ; 
+	return ((rand()+idx) % 3) ; 
 
 }
 
@@ -85,10 +85,7 @@ static void sendMessage(int msgid, int idx){
 	bufS.mtype = idx; 
 
 	//Get Type of message
-	int messageT = getMessageType(); 
-	
-	//Test output
-	//fprintf(stderr, "USER: SendMessage() Message TYPE: %d\n", messageT) ;
+	int messageT = getMessageType(idx); 
 
 	if(messageT != ready){
 		
@@ -111,6 +108,7 @@ static void sendMessage(int msgid, int idx){
 	else if( messageT == blocked ){
 
 		strcpy(bufS.mtext, "blocked"); 
+		blockedWait(); 
 	}
 	else {
 
@@ -121,12 +119,42 @@ static void sendMessage(int msgid, int idx){
 	//Message Sent 
 	fprintf(stderr, "user: Sending msg to OSS mID: %d\n", idx); 
 
-//	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext)+1, IPC_NOWAIT)) == -1){
 	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext), 0)) == -1){
 
 		perror("user: ERROR: Failed to msgsnd() ");
 		exit(EXIT_FAILURE); 
 	}
+}
+
+
+//Wait while user blocked while User Blocked
+static void blockedWait(){
+
+	float bWait = rand()%10000000; 
+
+	timeLocal = getTime(); 
+	
+	float unblocked = timeLocal + bWait/1000000000; 
+
+	fprintf(stderr, "user: Time: %f  Unblocked: %f\n", timeLocal, unblocked);  
+
+}
+
+
+//Get time 
+static float getTime(){
+	
+	float decimal = sysTimePtr->nanoSeconds;
+	decimal = decimal/1000000000;
+	float second = sysTimePtr->seconds; 
+	
+	float localT = second+decimal; 
+
+//	fprintf(stderr, "++++++ User: Seconds = %f  Decimal = %f  LocalT: %f\n", second, decimal, localT); 
+	
+	return localT; 
+
+
 }
 
 

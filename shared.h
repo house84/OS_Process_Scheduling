@@ -27,11 +27,6 @@ struct PCB{
 
 }pcb; 
 
-//struct PCB *pcbArr[18];      //Array for Running PCBs
-
-//struct PCB *pcbPTR;          //PCB Ptr
-
-//Messaging for Sending
 
 struct msgBuf{
 
@@ -40,9 +35,14 @@ struct msgBuf{
 
 };
 
-struct msgBuf bufS;
-struct msgBuf bufR;
-struct msgBuf buf3; 
+struct msgBuf bufS;         //Send Msg from OSS -> User
+struct msgBuf bufR;         //Send Msg from User -> OSS
+struct msgBuf buf3;         //Message signal User initialized
+
+int shmidMsg;               //Msg id for OSS->User
+int shmidMsg2;            //Msg id for User->OSS
+int shmidMsg3;              //Msg id for User initialize
+int shmidSysTime;           //Shared Memory Id
 
 //System Time
 struct system_Time{
