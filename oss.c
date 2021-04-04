@@ -67,8 +67,8 @@ int main(int argc, char * argv[]){
 
 	//Set 3 Second Timer
 	stopProdTimer = false; 
-	//setTimer2(3); 
-	setTimer2(100); 
+	setTimer2(3); 
+//	setTimer2(100); 
 
 	//Create Shared Memory
 	createSharedMemory(); 
@@ -104,7 +104,7 @@ int main(int argc, char * argv[]){
 		incrementSysTime(100000000); 
 		
 		//Spawn Child Process //Set to 20 for testing
-		if( concProc < 12 && totalProc < 100 && stopProdTimer == false){
+		if( concProc < 19 && totalProc < 100 && stopProdTimer == false){
 
 			index = getBitVectorPos(); 
 			if(index != -1) { 
@@ -480,8 +480,7 @@ static void spawn(int idx){
 		char buffer_msgId[50];
 		sprintf(buffer_msgId, "%d", shmidMsg);
 
-
-	//	bool run = true; 
+		//bool run = true; 
 		//shmidMsgRcv arg
 		char buffer_msgId2[50];
 		sprintf(buffer_msgId2, "%d", shmidMsgRcv); 
