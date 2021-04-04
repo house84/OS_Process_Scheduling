@@ -118,7 +118,7 @@ int main(int argc, char * argv[]){
 				++totalProc; 
 				++concProc;
 			
-				fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
+		//		fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
 				
 				//Allow User to initialize
 				if(msgrcv(shmidMsg3, &buf3, sizeof(buf3.mtext), index+1, 0) == -1){
@@ -126,6 +126,9 @@ int main(int argc, char * argv[]){
 					perror("OSS: ERROR: Failed to RCV Message from user msgrcv() ");
 					exit(EXIT_FAILURE); 
 				}
+
+				//Message new Process Created 
+				fprintf(stderr, "OSS: Time: %s PID: %d\t|||| New User Process Created\n", getSysTime(), index);
 
 				//Add to RunQ
 				enqueue(index);
@@ -182,7 +185,7 @@ int main(int argc, char * argv[]){
 	while(wait(NULL) > 0){} 
 	
 	//Testing Output
-	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
+//	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
 	//Clean up Resources
 	signalHandler(3126);
@@ -625,10 +628,10 @@ static void enqueue(int idx){
 	newNode->fakePID = idx; 
 	newNode->next = NULL; 
 
+	++GQue->currSize; 
+
 	//Test Print
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to position %d in Run Queue\n", getSysTime(), newNode->fakePID, GQue->currSize); 
-
-	++GQue->currSize; 
 
 	//Check if Empty
 	if( GQue->head == NULL && GQue->tail == NULL ){

@@ -22,7 +22,7 @@ int main(int argc, char * argv[]){
 	int mID = idx+1;
 	run = true; 
 
-	fprintf(stderr,"IN USER IDX: %d mID: %d\n", idx, mID); 
+//	fprintf(stderr,"IN USER IDX: %d mID: %d\n", idx, mID); 
 
 	//Initiate SHM
 	initSysTime();
@@ -30,32 +30,36 @@ int main(int argc, char * argv[]){
 	//Initialize PCB Values
 	initPCB(idx); 
 	
-	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
+//	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
 	
-	sysTimePtr->pcbTable[idx].cpu_Time = sysTimePtr->nanoSeconds; 
+//	sysTimePtr->pcbTable[idx].cpu_Time = sysTimePtr->nanoSeconds; 
 
-	fprintf(stderr, "Test Program: %s\n", argv[0]); 
-	fprintf(stderr, "Index: %d\n", atoi(argv[1])); 
-	fprintf(stderr, "SHMID: %d\n", atoi(argv[2]));
-	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
-	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
+//	fprintf(stderr, "Test Program: %s\n", argv[0]); 
+//	fprintf(stderr, "Index: %d\n", atoi(argv[1])); 
+//	fprintf(stderr, "SHMID: %d\n", atoi(argv[2]));
+//	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
+//	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
 
-	int i; 
-	
+//	int i; 
+//
+	//Used to Calculate Wait Time
+	float waitLocal;
+
 	buf3.mtype = mID;
 	strcpy(buf3.mtext, ""); 
-
+	//Messaging needed to allow consistent behavior of OSS running on real Hoare Kernel
 	msgsnd(shmidMsg3, &buf3, sizeof(buf3.mtext), 0); 
 
 	while(run == true){
 
-		fprintf(stderr, "user: mID: %d Wating for OSS\n", mID); 
+
 		//Recienve Message to Run from CPU
 		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
-	
+		sysTimePtr->pcbTable[idx].waited_Time += getTime() - waitLocal; 
 		
 		//Send Message Back to OSS
 		sendMessage(shmidMsg2, mID); 
+		waitLocal = getTime(); 
 	}
 
 	//Free Memory
@@ -113,6 +117,7 @@ static void sendMessage(int msgid, int idx){
 	else {
 
 		strcpy(bufS.mtext, "terminated");
+		sysTimePtr->pcbTable[idx].system_Time = getTime()-sysTimePtr->pcbTable[idx].time_Started;
 		run = false; 
 	}
 
@@ -133,6 +138,7 @@ static void blockedWait(int idx){
 	float nanoWait = rand()%100000001; 
 	float secWait = rand()%6; 
 	float bWait = secWait + nanoWait/1000000000;
+	sysTimePtr->pcbTable[idx].blocked_Time += bWait; 
 	timeLocal = getTime(); 
 	
 	float unblocked = timeLocal + bWait; 
