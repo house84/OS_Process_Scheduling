@@ -94,20 +94,22 @@ int main(int argc, char * argv[]){
 	int i; 
 	int index; 
 	int iterTime; 
-	int timeMakeNewUser = getTime() + rand()%3; 
+	
+//	float timeMakeNewUser = getTime() + rand()%3;  
+	float newUser = getTime() + newUserTime(); 
 	concProc = 0; 
 	
 	while(true){
 
 		//Increment System Time by NanoSeconds
 		iterTime = rand()%10000001 + 1000000000; 
-		fprintf(stderr, "Iter Time: %d\n", iterTime); 
+		fprintf(stderr, "Iter Time: %d makeNewTime: %f\n", iterTime, newUser); 
 		incrementSysTime(iterTime); 
 
 		checkBlockedQ(); 
 		
 		//Spawn Child Process //Set to 20 for testing
-		if( concProc < 19 && totalProc < 100 && stopProdTimer == false ){//&& timeMakeNewUser < getTime()){
+		if( concProc < 18 && totalProc < 100 && stopProdTimer == false && newUser < getTime()){
 
 			index = getBitVectorPos(); 
 			if(index != -1) { 
@@ -128,7 +130,7 @@ int main(int argc, char * argv[]){
 				//Add to RunQ
 				enqueue(index);
 
-				timeMakeNewUser = getTime() + rand()%3; 
+				newUser = getTime() + newUserTime(); 
 			}
 		}
 		
@@ -615,7 +617,7 @@ struct Queue * initQueue(){
 static void enqueue(int idx){
 
 	//Testing
-	fprintf(stderr, "ENQUEU index: %d\n", idx); 
+//	fprintf(stderr, "ENQUEU index: %d\n", idx); 
 
 	struct p_Node *newNode = (struct p_Node*)malloc(sizeof(struct p_Node));  
 	
@@ -624,7 +626,7 @@ static void enqueue(int idx){
 	newNode->next = NULL; 
 
 	//Test Print
-	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to Queue[%d]\n", getSysTime(), newNode->fakePID, GQue->currSize); 
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to position %d in Run Queue\n", getSysTime(), newNode->fakePID, GQue->currSize); 
 
 	++GQue->currSize; 
 
@@ -664,7 +666,7 @@ struct p_Node * dequeue(){
 	if( GQue->head == NULL ){ GQue->tail = NULL; }
 
 	//Test Print
-	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed from Queue\n", getSysTime(), newNode->fakePID); 
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed from Run Queue\n", getSysTime(), newNode->fakePID); 
 
 	return newNode; 
 
@@ -718,8 +720,8 @@ static void allocateCPU(){
 	}
 
 	//Testing
-	fprintf(stderr, "In Allocate CPU, mID: %d\n", CPU_Node->fakePID+1); 
-
+	//fprintf(stderr, "In Allocate CPU, mID: %d\n", CPU_Node->fakePID+1); 
+	
 	int idx = CPU_Node->fakePID; 
 	int mID = CPU_Node->fakePID+1; 
 
@@ -737,12 +739,22 @@ static void allocateCPU(){
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Sent to CPU\n", getSysTime(), idx); 
 
 
-	//Need to wait for message back that 
+	//Wait for message from User to simulate end CPU 
 	msgrcv(shmidMsg2, &bufR, sizeof(bufR.mtext), mID, 0);
 
+	//Get dispatch Time and display
+	dispatchTime(idx); 
+	
+	//Determine how much of the quantum was used
+	int sprint  = sysTimePtr->pcbTable[idx].sprint_Time; 
+	sprint = sprint; 
+//	sprint = sprint*1000000; 
+	
+	//Show Time Run
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Spent %d nanoseconds in CPU\n", getSysTime(), idx, sprint); 
 	
 	//Display Message
-	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
+//	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
 
 	
 	//Check return
@@ -750,15 +762,13 @@ static void allocateCPU(){
 
 	//	fprintf(stderr," TERMINATED\n");
 		
-		//Determine how much of the quantum was used
-		int sprint  = sysTimePtr->pcbTable[idx].sprint_Time; 
-		sprint = sprint*1000000; 
 		incrementSysTime(sprint); 
 		
 		unsetBitVectorVal(idx); 
 		
 		//Print Update for Ready
 		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Terminated\n", getSysTime(), idx); 
+
 		
 		return; 
 	}
@@ -766,10 +776,6 @@ static void allocateCPU(){
 	if( strcmp(bufR.mtext, "blocked") == 0){
 		
 		blockedQ[idx] = 1; 
-
-		int sprint = sysTimePtr->pcbTable[idx].sprint_Time; 
-		sprint = sprint*1000000; 
-		incrementSysTime(sprint); 
 
 		//Print Update
 		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to Blocked Queue\n", getSysTime(), idx);
@@ -786,6 +792,16 @@ static void allocateCPU(){
 	}
 }
 
+
+static void dispatchTime(int idx){
+
+	//Add Dispatch time 100-10,000ns
+	int disTime = rand()%9901 + 100; 
+	incrementSysTime(disTime); 
+	
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Time in Dispatch %d nanoseconds\n", getSysTime(), idx, disTime);
+
+}
 
 //Initialize BlockedQ
 static void initBlockedQ(){
@@ -826,7 +842,18 @@ static float getTime(){
 	float decimal = sysTimePtr->nanoSeconds; 
 	decimal = decimal/1000000000;
 	float second = sysTimePtr->seconds; 
+	float localT = second+decimal; 
 
+	return localT; 
+}
+
+
+//Get Time for New user Process Offset
+static float newUserTime(){
+
+	float decimal = rand()%maxTimeBetweenNewProcNS;
+	decimal = decimal/1000000000; 
+	float second = rand()%maxTimeBetweenNewProcSecs; 
 	float localT = second+decimal; 
 
 	return localT; 

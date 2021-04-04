@@ -8,7 +8,8 @@
 
 int main(int argc, char * argv[]){
 
-	srand(time(NULL)); 
+//	srand(time(NULL)); 
+	srand(time(NULL) ^ (getpid()<<16)); 
 
 	//Set Shmids
 	shmidSysTime = atoi(argv[2]);
@@ -75,7 +76,7 @@ static int getMessageType(int idx){
 //Decide how long to spend in quantum 10ms
 static int getRandTime(){
 
-	return (rand()%10) + 1; 
+	return (rand()% 8800001) + 200000; 
 
 }
 
@@ -91,14 +92,13 @@ static void sendMessage(int msgid, int idx){
 		
 		int rand = getRandTime(); 
 		sysTimePtr->pcbTable[idx].sprint_Time = rand; 
-
-		sysTimePtr->pcbTable[idx].cpu_Time += rand; 
+		sysTimePtr->pcbTable[idx].cpu_Time += rand/1000000000; 
 	}
 	else{
 
-		sysTimePtr->pcbTable[idx].sprint_Time = 10; 
+		sysTimePtr->pcbTable[idx].sprint_Time = 10000000; 
 
-		sysTimePtr->pcbTable[idx].proc_id += 10; 
+		sysTimePtr->pcbTable[idx].cpu_Time += .01; 
 	}
 	
 	if(messageT == ready){

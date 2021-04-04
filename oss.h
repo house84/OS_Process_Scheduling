@@ -8,6 +8,8 @@
 #define OSS_H
 
 #define procMax 18
+#define maxTimeBetweenNewProcNS 1000000000 
+#define maxTimeBetweenNewProcSecs 2
 #include "headers.h"
 
 struct Queue{                          //Queue for Ready 
@@ -45,8 +47,10 @@ static void openLogfile();             //Open Logfile
 static void closeLogfile();            //Close Logfile
 static void displayStats();            //Display Stats
 static void initBlockedQ();            //Initialize Blocked Q -> 0
+static void dispatchTime();            //Increment Sys Time for Dispatching
 static void signalHandler();           //Handle Signal timer/ctrl+c
 static void checkBlockedQ();           //Search Blocked Que for Freed Proc
+static float  newUserTime();           //Get time to offset new User spawn
 static void stopTimeHandler();         //Stop Producing Timer Handler
 static int  getBitVectorPos();         //Search bit vector for open idx
 static void freeSharedMemory();        //Release Shared Memory Resources
