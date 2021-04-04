@@ -22,7 +22,6 @@ int main(int argc, char * argv[]){
 	myTimer = 100; 
 	totalProc = 0;  
 	srand(time(NULL)); 
-//	bv_t bitVector; 
 	
 	//Parse input Args
 	int c = 0; 
@@ -84,8 +83,14 @@ int main(int argc, char * argv[]){
 	//Initilize BQ
 	initBlockedQ(); 
 
+	//Initialize STAT
+	sysTimePtr->stats.totalProc = 0; 
+	sysTimePtr->stats.cpu_Time = 0; 
+	sysTimePtr->stats.waited_Time = 0; 
+	sysTimePtr->stats.blocked_Time = 0; 
+	sysTimePtr->stats.idle_Time = 0; 
+
 	//Initialize CPU Node
-	//struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
 	CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
 
 	//=========== Add Program Logic =============
@@ -94,8 +99,6 @@ int main(int argc, char * argv[]){
 	int i; 
 	int index; 
 	int iterTime; 
-	
-//	float timeMakeNewUser = getTime() + rand()%3;  
 	float newUser = getTime() + newUserTime(); 
 	concProc = 0; 
 	
@@ -103,7 +106,6 @@ int main(int argc, char * argv[]){
 
 		//Increment System Time by NanoSeconds
 		iterTime = rand()%10000001 + 1000000000; 
-		fprintf(stderr, "Iter Time: %d makeNewTime: %f\n", iterTime, newUser); 
 		incrementSysTime(iterTime); 
 
 		checkBlockedQ(); 
@@ -117,9 +119,8 @@ int main(int argc, char * argv[]){
 				spawn(index); 
 				++totalProc; 
 				++concProc;
-			
-		//		fprintf(stderr, "::::::::::::::::::: Spawned index: %d, Total Proc: %d, ConcProc: %d\n", index, totalProc, concProc); 
-				
+				sysTimePtr->stats.totalProc = totalProc; 
+
 				//Allow User to initialize
 				if(msgrcv(shmidMsg3, &buf3, sizeof(buf3.mtext), index+1, 0) == -1){
 
@@ -136,19 +137,12 @@ int main(int argc, char * argv[]){
 				newUser = getTime() + newUserTime(); 
 			}
 		}
-		
 	
-		//Try Running Process in CPU
-		
 		//Check runQueue
 		allocateCPU();
-			
 		
-	//	sysTimePtr->pcbTable[index] = pcb;  
-
 		//check for Finished Processes
 		int status; 
-	//	pid_t user_id = 0; 
 		
 		pid_t user_id = waitpid(-1, &status, WNOHANG); 
 
@@ -158,23 +152,13 @@ int main(int argc, char * argv[]){
 			--concProc;
 		}
 
-	//	if(concProc > 1){
-	//		wait(NULL);
-	//		--concProc;
-	//	}
-
 		//Break Loop clean up memory
 		if((totalProc == 100 || stopProdTimer == true) && concProc == 0){
 		
+			sysTimePtr->stats.end_Time = getTime(); 
 			break; 
 		}
 
-//		if( totalProc %18  == 0 ){
-
-		//Slowdown for testing
-			//sleep(rand()%3);
-//			sleep(1); 
-//		}
 	}
 
 
@@ -183,9 +167,6 @@ int main(int argc, char * argv[]){
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){} 
-	
-	//Testing Output
-//	printf("Test Program: %s Timer: %d FileName: %s\n", argv[0], myTimer, logfile); 
 	
 	//Clean up Resources
 	signalHandler(3126);
@@ -219,13 +200,8 @@ void signalHandler(int sig){
 	}else{
 
 	  	fprintf(stderr, "\nProgram Terminated due to Timer\n"); 
-		//fprintf(logfilePtr, "\nTime: %sProgram Termintated due to Timer\n", ctime(&t)); 
-
 	}
 
-
-	//fprintf(shmptr->logfilePtr,"\n//****************** END FILE ENTRY ********************//\n\n"); 
-	
 	//Display Stats
 	displayStats(); 
 	
@@ -430,11 +406,9 @@ static void incrementSysTime(int x){
 
 	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds + x; 
 
-//	if(sysTimePtr->nanoSeconds >= 1000000000 ){
 	while(sysTimePtr->nanoSeconds >= 1000000000 ){
 
 		sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 1000000000;  
-	//	sysTimePtr->nanoSeconds = 0;  
 		
 		sysTimePtr->seconds += 1; 
 	}	
@@ -588,21 +562,26 @@ static void closeLogfile(){
 
 //Display Stats/Print Stats
 static void displayStats(){
+	
+	float total = sysTimePtr->stats.totalProc; 
+
+	fprintf(stderr,"CPU Time: %f\n", sysTimePtr->stats.cpu_Time); 
 
 	//Print to logs and Display
-	fprintf(stderr, "displayStats()\n"); 
-
-}
+	fprintf(stderr, "\n\n//////////////// PROGRAM REPORT ////////////////\n"); 
+	fprintf(stderr, "Average Process CPU Time: %f\n", sysTimePtr->stats.cpu_Time/total); 
+	fprintf(stderr, "Average Process System Time: %f\n", sysTimePtr->stats.system_Time/total); 
+	fprintf(stderr, "Average Process Wait Time: %f\n", sysTimePtr->stats.waited_Time/total); 
+	fprintf(stderr, "Average Process Blocked Time: %f\n", sysTimePtr->stats.blocked_Time/total); 
+	fprintf(stderr, "CPU Idle Time: %f\n", sysTimePtr->stats.end_Time - sysTimePtr->stats.cpu_Time); 
+	fprintf(stderr, "//////////////// |||||||||||||| ////////////////\n"); 
+}	
 
 
 //Initialize Queue
-//struct Queue * initQueue(int pid){
 struct Queue * initQueue(){
 
 	struct Queue *que = (struct Queue*)malloc(sizeof(struct Queue));
-
-	//fprintf(stderr, "IN INITQUEUE\n"); 
-
 
 	//Initialize Null Front and Rear Nodes
 	que->head = NULL; 
@@ -619,11 +598,7 @@ struct Queue * initQueue(){
 //Enqueue Process to Queue
 static void enqueue(int idx){
 
-	//Testing
-//	fprintf(stderr, "ENQUEU index: %d\n", idx); 
-
 	struct p_Node *newNode = (struct p_Node*)malloc(sizeof(struct p_Node));  
-	
 
 	newNode->fakePID = idx; 
 	newNode->next = NULL; 
@@ -651,9 +626,6 @@ static void enqueue(int idx){
 
 //Dequeue Process from Queue
 struct p_Node * dequeue(){
-
-	//Testing
-	//fprintf(stderr, "Dequeue\n"); 	
 
 	//Check if Que is empty
 	if( GQue->head == NULL ){ return NULL; }
@@ -722,9 +694,6 @@ static void allocateCPU(){
 		return; 
 	}
 
-	//Testing
-	//fprintf(stderr, "In Allocate CPU, mID: %d\n", CPU_Node->fakePID+1); 
-	
 	int idx = CPU_Node->fakePID; 
 	int mID = CPU_Node->fakePID+1; 
 
@@ -751,20 +720,13 @@ static void allocateCPU(){
 	//Determine how much of the quantum was used
 	int sprint  = sysTimePtr->pcbTable[idx].sprint_Time; 
 	sprint = sprint; 
-//	sprint = sprint*1000000; 
 	
 	//Show Time Run
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Spent %d nanoseconds in CPU\n", getSysTime(), idx, sprint); 
 	
-	//Display Message
-//	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
-
-	
 	//Check return
 	if( strcmp(bufR.mtext, "terminated") == 0){
 
-	//	fprintf(stderr," TERMINATED\n");
-		
 		incrementSysTime(sprint); 
 		
 		unsetBitVectorVal(idx); 
@@ -798,7 +760,6 @@ static void allocateCPU(){
 
 static void dispatchTime(int idx){
 
-	//Add Dispatch time 100-10,000ns
 	int disTime = rand()%9901 + 100; 
 	incrementSysTime(disTime); 
 	
@@ -824,8 +785,6 @@ static void checkBlockedQ(){
 
 	int i;
 	float localT = getTime(); 
-
-	fprintf(stderr, "IN CHECK BLOCK LocalT = %f\n", localT);
 
 	for(i = 0; i < 18; ++i){
 

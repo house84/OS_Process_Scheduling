@@ -8,7 +8,6 @@
 
 int main(int argc, char * argv[]){
 
-//	srand(time(NULL)); 
 	srand(time(NULL) ^ (getpid()<<16)); 
 
 	//Set Shmids
@@ -22,44 +21,35 @@ int main(int argc, char * argv[]){
 	int mID = idx+1;
 	run = true; 
 
-//	fprintf(stderr,"IN USER IDX: %d mID: %d\n", idx, mID); 
-
 	//Initiate SHM
 	initSysTime();
 
 	//Initialize PCB Values
 	initPCB(idx); 
 	
-//	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
-	
-//	sysTimePtr->pcbTable[idx].cpu_Time = sysTimePtr->nanoSeconds; 
-
-//	fprintf(stderr, "Test Program: %s\n", argv[0]); 
-//	fprintf(stderr, "Index: %d\n", atoi(argv[1])); 
-//	fprintf(stderr, "SHMID: %d\n", atoi(argv[2]));
-//	fprintf(stderr, "SHMID MSG: %d\n", atoi(argv[3]));
-//	fprintf(stderr, "PCB CPU Time: %d\n", sysTimePtr->pcbTable[idx].cpu_Time); 
-
-//	int i; 
-//
 	//Used to Calculate Wait Time
-	float waitLocal;
-
+	float waitLocal1;
+	float waitLocal2; 
 	buf3.mtype = mID;
 	strcpy(buf3.mtext, ""); 
-	//Messaging needed to allow consistent behavior of OSS running on real Hoare Kernel
+
+	//Messaging needed to allow consistent behavior 
+	//of OSS running on real Hoare Kernel
 	msgsnd(shmidMsg3, &buf3, sizeof(buf3.mtext), 0); 
 
 	while(run == true){
 
 
 		//Recienve Message to Run from CPU
-		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0); 
-		sysTimePtr->pcbTable[idx].waited_Time += getTime() - waitLocal; 
+		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0);
+
+		waitLocal2 = getTime(); 
+		sysTimePtr->pcbTable[idx].waited_Time += (waitLocal2 - waitLocal1); 
 		
+		fprintf(stderr, "(((((((((((%f  wait; %f\n", waitLocal1, sysTimePtr->pcbTable[idx].waited_Time); 
 		//Send Message Back to OSS
 		sendMessage(shmidMsg2, mID); 
-		waitLocal = getTime(); 
+		waitLocal1 = getTime(); 
 	}
 
 	//Free Memory
@@ -78,7 +68,7 @@ static int getMessageType(int idx){
 }
 
 //Decide how long to spend in quantum 10ms
-static int getRandTime(){
+static float getRandTime(){
 
 	return (rand()% 8800001) + 200000; 
 
@@ -94,15 +84,14 @@ static void sendMessage(int msgid, int idx){
 
 	if(messageT != ready){
 		
-		int rand = getRandTime(); 
+		float rand = getRandTime(); 
 		sysTimePtr->pcbTable[idx].sprint_Time = rand; 
-		sysTimePtr->pcbTable[idx].cpu_Time += rand/1000000000; 
+		sysTimePtr->pcbTable[idx].cpu_Time += rand/1000000000;  
 	}
 	else{
 
 		sysTimePtr->pcbTable[idx].sprint_Time = 10000000; 
-
-		sysTimePtr->pcbTable[idx].cpu_Time += .01; 
+		sysTimePtr->pcbTable[idx].cpu_Time += .010000000; 
 	}
 	
 	if(messageT == ready){
@@ -119,10 +108,12 @@ static void sendMessage(int msgid, int idx){
 		strcpy(bufS.mtext, "terminated");
 		sysTimePtr->pcbTable[idx].system_Time = getTime()-sysTimePtr->pcbTable[idx].time_Started;
 		run = false; 
-	}
+		
 
-	//Message Sent 
-	fprintf(stderr, "user: Sending msg to OSS mID: %d\n", idx); 
+		//Display Process Stats	
+		updateGlobal(idx); 
+	 	printStats(idx); 
+	}
 
 	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext), 0)) == -1){
 
@@ -143,9 +134,6 @@ static void blockedWait(int idx){
 	
 	float unblocked = timeLocal + bWait; 
 	sysTimePtr->pcbTable[idx].wake_Up = unblocked; 
-
-	fprintf(stderr, "user: Time: %f  Unblocked: %f\n", timeLocal, unblocked);  
-
 }
 
 
@@ -158,10 +146,7 @@ static float getTime(){
 	
 	float localT = second+decimal; 
 
-//	fprintf(stderr, "++++++ User: Seconds = %f  Decimal = %f  LocalT: %f\n", second, decimal, localT); 
-	
 	return localT; 
-
 
 }
 
@@ -201,3 +186,26 @@ static void initPCB(int idx){
 }
 
 
+//Update Global Stats
+static void updateGlobal(int idx){
+
+	sysTimePtr->stats.cpu_Time += sysTimePtr->pcbTable[idx].cpu_Time; 
+	sysTimePtr->stats.system_Time += sysTimePtr->pcbTable[idx].system_Time; 
+	sysTimePtr->stats.waited_Time += sysTimePtr->pcbTable[idx].waited_Time; 
+	sysTimePtr->stats.blocked_Time += sysTimePtr->pcbTable[idx].blocked_Time; 
+}
+
+
+//Display stats upon Termination
+static void printStats(int idx){
+
+	fprintf(stderr, "\n//////////// USER PROCESS STATS ////////////\n");
+	fprintf(stderr, "Time: %f\n", getTime()); 
+	fprintf(stderr, "User ID: %d\n", idx-1); 
+	fprintf(stderr, "Total Start Time (seconds): %f\n", sysTimePtr->pcbTable[idx].time_Started); 
+	fprintf(stderr, "Total System Time (seconds): %f\n", sysTimePtr->pcbTable[idx].system_Time); 
+	fprintf(stderr, "Total CPU Time (seconds): %f\n", sysTimePtr->pcbTable[idx].cpu_Time); 
+	fprintf(stderr, "Total Waited Time (seconds): %f\n", sysTimePtr->pcbTable[idx].waited_Time); 
+	fprintf(stderr, "Total blocked Time (seconds): %f\n", sysTimePtr->pcbTable[idx].blocked_Time); 
+	fprintf(stderr, "//////////// |||||||||||||||||| ////////////\n\n");
+}

@@ -32,6 +32,17 @@ struct PCB{
 
 }pcb; 
 
+//Hold Stats 
+struct STAT{
+
+	int totalProc; 
+	float cpu_Time; 
+	float system_Time; 
+	float waited_Time;
+	float blocked_Time; 
+	float idle_Time;
+	float end_Time; 
+}; 
 
 struct msgBuf{
 
@@ -55,7 +66,7 @@ struct system_Time{
 	int seconds;
 	int nanoSeconds;
 	struct PCB pcbTable[18]; 
-
+	struct STAT stats; 
 };
  
 #endif
