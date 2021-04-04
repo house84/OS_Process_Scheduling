@@ -32,9 +32,10 @@ static void spawn();                   //Spawn Child Process
 static void printQ();                  //Print Queue
 static void enqueue();                 //Add Child to Queue
 static void setTimer();                //Set initial Timer
-void setBitVectorVal();                //Set BitVector used from idx 
-void unsetBitVectorVal();              //Clear Bitvector from idx
+void setBitVectorVal();                //Set BitVector used from idx
+static float getTime();                //Get time with decimal xx.xxx
 static void setTimer2();               //Set 3 Second Timer
+void unsetBitVectorVal();              //Clear Bitvector from idx
 static void setSysTime();              //Set the System Time
 const char *getSysTime();              //Return formatted System Time
 struct p_Node * dequeue();             //Remove Head

@@ -68,7 +68,6 @@ int main(int argc, char * argv[]){
 	//Set 3 Second Timer
 	stopProdTimer = false; 
 	setTimer2(3); 
-//	setTimer2(100); 
 
 	//Create Shared Memory
 	createSharedMemory(); 
@@ -82,6 +81,9 @@ int main(int argc, char * argv[]){
 	//Initialize Queue
 	GQue = initQueue(); 
 
+	//Initilize BQ
+	initBlockedQ(); 
+
 	//Initialize CPU Node
 	//struct p_Node *CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
 	CPU_Node = (struct p_Node*)malloc(sizeof(struct p_Node)); 
@@ -91,20 +93,21 @@ int main(int argc, char * argv[]){
 
 	int i; 
 	int index; 
+	int iterTime; 
+	int timeMakeNewUser = getTime() + rand()%3; 
 	concProc = 0; 
 	
-	//For Real 
-	//whlie(totalProc < 100 && stopProdTimer == false){ 
-	
-	//Testing While
-//	while( totalProc < 10 && stopProdTimer == false ){ 
 	while(true){
 
 		//Increment System Time by NanoSeconds
-		incrementSysTime(100000000); 
+		iterTime = rand()%10000001 + 1000000000; 
+		fprintf(stderr, "Iter Time: %d\n", iterTime); 
+		incrementSysTime(iterTime); 
+
+		checkBlockedQ(); 
 		
 		//Spawn Child Process //Set to 20 for testing
-		if( concProc < 19 && totalProc < 100 && stopProdTimer == false){
+		if( concProc < 19 && totalProc < 100 && stopProdTimer == false ){//&& timeMakeNewUser < getTime()){
 
 			index = getBitVectorPos(); 
 			if(index != -1) { 
@@ -124,14 +127,12 @@ int main(int argc, char * argv[]){
 
 				//Add to RunQ
 				enqueue(index);
+
+				timeMakeNewUser = getTime() + rand()%3; 
 			}
 		}
 		
-		
-		//Check for freed Proc From Blocked Que
-		//checkBlockedQue(); 
-		//
-		//
+	
 		//Try Running Process in CPU
 		
 		//Check runQueue
@@ -163,12 +164,12 @@ int main(int argc, char * argv[]){
 			break; 
 		}
 
-		if( totalProc %18  == 0 ){
+//		if( totalProc %18  == 0 ){
 
 		//Slowdown for testing
 			//sleep(rand()%3);
-			sleep(1); 
-		}
+//			sleep(1); 
+//		}
 	}
 
 
@@ -424,14 +425,16 @@ static void incrementSysTime(int x){
 
 	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds + x; 
 
-	if(sysTimePtr->nanoSeconds >= 1000000000 ){
+//	if(sysTimePtr->nanoSeconds >= 1000000000 ){
+	while(sysTimePtr->nanoSeconds >= 1000000000 ){
 
-	//	sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 100000000;  
-		sysTimePtr->nanoSeconds = 0;  
+		sysTimePtr->nanoSeconds = sysTimePtr->nanoSeconds - 1000000000;  
+	//	sysTimePtr->nanoSeconds = 0;  
 		
 		sysTimePtr->seconds += 1; 
 	}	
 }
+
 
 //Show System Time
 static void showSysTime(){
@@ -621,7 +624,7 @@ static void enqueue(int idx){
 	newNode->next = NULL; 
 
 	//Test Print
-	fprintf(stderr, "OSS: Time: %s PID: %d |||| Added to Queue[%d]\n", getSysTime(), newNode->fakePID, GQue->currSize); 
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to Queue[%d]\n", getSysTime(), newNode->fakePID, GQue->currSize); 
 
 	++GQue->currSize; 
 
@@ -661,7 +664,7 @@ struct p_Node * dequeue(){
 	if( GQue->head == NULL ){ GQue->tail = NULL; }
 
 	//Test Print
-	fprintf(stderr, "OSS: Time: %s PID: %d |||| Removed from Queue\n", getSysTime(), newNode->fakePID); 
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed from Queue\n", getSysTime(), newNode->fakePID); 
 
 	return newNode; 
 
@@ -717,6 +720,7 @@ static void allocateCPU(){
 	//Testing
 	fprintf(stderr, "In Allocate CPU, mID: %d\n", CPU_Node->fakePID+1); 
 
+	int idx = CPU_Node->fakePID; 
 	int mID = CPU_Node->fakePID+1; 
 
 	bufS.mtype = mID; 
@@ -730,7 +734,7 @@ static void allocateCPU(){
 	}
 
 	//Print Update from CPU 
-	fprintf(stderr, "OSS: Time: %s PID: %d |||| Sent to CPU\n", getSysTime(), CPU_Node->fakePID); 
+	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Sent to CPU\n", getSysTime(), idx); 
 
 
 	//Need to wait for message back that 
@@ -740,15 +744,46 @@ static void allocateCPU(){
 	//Display Message
 	fprintf(stderr,"mID: %d => Message: %s\n", mID, bufR.mtext); 
 
+	
+	//Check return
 	if( strcmp(bufR.mtext, "terminated") == 0){
 
-		fprintf(stderr," TERMINATED\n");
-		unsetBitVectorVal(CPU_Node->fakePID); 
+	//	fprintf(stderr," TERMINATED\n");
+		
+		//Determine how much of the quantum was used
+		int sprint  = sysTimePtr->pcbTable[idx].sprint_Time; 
+		sprint = sprint*1000000; 
+		incrementSysTime(sprint); 
+		
+		unsetBitVectorVal(idx); 
+		
+		//Print Update for Ready
+		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Terminated\n", getSysTime(), idx); 
+		
 		return; 
 	}
-	
-	//Add Process Back to Queue
-	enqueue(CPU_Node->fakePID); 
+
+	if( strcmp(bufR.mtext, "blocked") == 0){
+		
+		blockedQ[idx] = 1; 
+
+		int sprint = sysTimePtr->pcbTable[idx].sprint_Time; 
+		sprint = sprint*1000000; 
+		incrementSysTime(sprint); 
+
+		//Print Update
+		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to Blocked Queue\n", getSysTime(), idx);
+
+		return; 
+	}
+
+	if(strcmp(bufR.mtext, "ready") == 0){
+
+		//Add Process Back to Queue
+		enqueue(idx); 
+		//Add Full Quantum to Systime
+		incrementSysTime(1000000); 
+	}
 }
 
 
@@ -769,13 +804,30 @@ static void initBlockedQ(){
 static void checkBlockedQ(){
 
 	int i;
+	float localT = getTime(); 
+
+	fprintf(stderr, "IN CHECK BLOCK LocalT = %f\n", localT);
+
 	for(i = 0; i < 18; ++i){
 
-		if( blockedQ[i]== -1 ){
-
+		if( blockedQ[i] == 1 && sysTimePtr->pcbTable[i].wake_Up <= localT ){
+			
+		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed From Blocked Queue\n", getSysTime(), i);
 			enqueue(i);
 			blockedQ[i] = 0; 
 		}
 
 	}
+}
+
+//Get system Time for Calcs xx.xxx
+static float getTime(){
+
+	float decimal = sysTimePtr->nanoSeconds; 
+	decimal = decimal/1000000000;
+	float second = sysTimePtr->seconds; 
+
+	float localT = second+decimal; 
+
+	return localT; 
 }

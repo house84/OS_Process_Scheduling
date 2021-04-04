@@ -108,7 +108,7 @@ static void sendMessage(int msgid, int idx){
 	else if( messageT == blocked ){
 
 		strcpy(bufS.mtext, "blocked"); 
-		blockedWait(); 
+		blockedWait(idx); 
 	}
 	else {
 
@@ -128,13 +128,15 @@ static void sendMessage(int msgid, int idx){
 
 
 //Wait while user blocked while User Blocked
-static void blockedWait(){
+static void blockedWait(int idx){
 
-	float bWait = rand()%10000000; 
-
+	float nanoWait = rand()%100000001; 
+	float secWait = rand()%6; 
+	float bWait = secWait + nanoWait/1000000000;
 	timeLocal = getTime(); 
 	
-	float unblocked = timeLocal + bWait/1000000000; 
+	float unblocked = timeLocal + bWait; 
+	sysTimePtr->pcbTable[idx].wake_Up = unblocked; 
 
 	fprintf(stderr, "user: Time: %f  Unblocked: %f\n", timeLocal, unblocked);  
 
@@ -180,12 +182,13 @@ static void freeSHM(){
 //Initialize PCB Values
 static void initPCB(int idx){
 
+	sysTimePtr->pcbTable[idx].time_Started = getTime();
 	sysTimePtr->pcbTable[idx].proc_id = getpid(); 
 	sysTimePtr->pcbTable[idx].proc_id_Sim = idx; 
 	sysTimePtr->pcbTable[idx].cpu_Time = 0; 
 	sysTimePtr->pcbTable[idx].system_Time = 0; 
-	sysTimePtr->pcbTable[idx].wait_Time = 0; 
-	sysTimePtr->pcbTable[idx].block_Time = 0; 
+	sysTimePtr->pcbTable[idx].waited_Time = 0; 
+	sysTimePtr->pcbTable[idx].blocked_Time = 0; 
 	sysTimePtr->pcbTable[idx].sprint_Time = 0; 
 	sysTimePtr->pcbTable[idx].msgID = idx+1;
 
