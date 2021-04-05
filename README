@@ -4,9 +4,88 @@ Author: Nick House
 Project: Project Scheduling
 Course: CS-4760 Operating Systems, Spring 2021
 Directory Name: house.4
-Created Files: 
-Included Files: 
+Created Files: (default) logfile - can be named by user 
+Included Files: oss.c, oss.h, user.c, user.h, shared.h, 
+                headers.h, Makefile, README
 ===============================================================
 ===============================================================
+
+What this Program Does: 
+-----------------------
+	
+	This program is to simulate scheduling as it is done inside
+	and operating system. The operating system simulator (OSS)
+	will generate child processes (USERS) for 3 seconds or up to 
+	100, not to exceed 18 concurrent USER programs. The OSS will 
+	then add USERS to a round-robin run queue and simulate each
+	USER getting CPU time with a quantum of 10 ms. The OSS and 
+	USER communicate using messages. When a USER is dispatched 
+	to the CPU it will simulate running and generate 1 of 3 
+	conditions, Ready, Blocked, or Terminate. If the USER returns 
+	Ready it has run for its entire quantum and it is put back 
+	onto the run queue by the OSS. If USER returns Blocked it will 
+	randomly select a time from 20%-100% of its quantum it ran and 
+	return the remaining to the OSS, it will also report how long 
+	it should be blocked and reporots to the OSS. The OSS will then 
+	put it into a blocked queue and wake it when its time has passed. 
+	Third condition is if USER returns Terminate. When this event 
+	happens USER will generate a time from 20%-100% of its quantum 
+	then return the rest to OSS. Its statistics are added to a 
+	global struct to document USER behaviors, the USER dies, OSS
+	removes this process from the run queue and clears it from 
+	the bit vector. 
+
+	After all USERS have stopped being produced, all active USERS
+	will continue to run until they terminate. Once all USERS 
+	terminate, memory resources are cleaned up, a report is generated
+	and a logfile has been populated for reviewing OSS processes. 
+
+===============================================================
+===============================================================
+
+How to Use this Program: 
+------------------------
+
+	1) Execute Makefile
+		
+		$ make
+
+	2) Execute oss prgram
+		
+		$ ./oss [-h][-s t][-l f]
+
+	USAGE: 
+
+		-h         Displays Help/Usage
+		-s t       Time in seconds before program terminates
+		-l f       Specifies the name for generated logfile
+
+===============================================================
+===============================================================
+
+Observations about this Program: 
+--------------------------------
+
+	An interesting observation I had during this project.
+	Is that this OSS is running ontop of an actual Operating 
+	System, so special considerations had to be added to ensure
+	this program actually behaved well when being executed by 
+	the CPU on the hoare server. Because the CPU time on hoare
+	is divided between all my processes there was times when 
+	my OSS would create a USER, add it to its run queue, pop it,
+	and send it a message to allocate it simulated CPU time. But
+	because of how actual CPU time is allocated the USER process 
+	would occasionly still be initializing its parameters and 
+	would not be waiting for its message yet. This would cause a
+	an error. I solved this by adding another message queue into 
+	the spawn USER process. Once a USER is spawned the OSS will not
+	continue until it recieves a message from the USER that it has
+	been initialized and is ready to recieve messages. 
+
+===============================================================
+===============================================================
+
+git Log History: 
+----------------
 
 
