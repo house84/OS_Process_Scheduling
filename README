@@ -89,3 +89,337 @@ git Log History:
 ----------------
 
 
+commit af8cc00206876616fc7ce635d578cf08df9dea09
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 22:29:08 2021 -0500
+
+    Readme Written
+
+commit 2b6ef10682643f170eefe0c26dd130280b81f74d
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 21:50:15 2021 -0500
+
+    All done except README
+
+commit 15cd215984d5a1437bccee257c3419912649ab4f
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 21:36:19 2021 -0500
+
+    Calculations Done, add print to logfile and write readme
+
+commit 7a5b57b6df55cdd91196779fa5a37a25ad14c7e9
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 17:54:16 2021 -0500
+
+    Need to fix wait and block time, then add Print to log
+
+commit f19bfe2e0fe9b76061f3247e038c0e1889efc89d
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 15:06:00 2021 -0500
+
+    Added Stat tracking in user, need to make report and print to logfile
+
+commit 783457f183584c9debfe1edc1169ca4997049181
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 14:31:48 2021 -0500
+
+    Constant new User Spawn has been implemented as per requirements, next sort stats, then add to logfile, then write README
+
+commit bed5e03b024eb102d6b4e0a51c0f8a4ccc9bbb68
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 12:13:50 2021 -0500
+
+    Blocked Q running, need to add Statistics and Logfile
+
+commit 1f4d8d7ed015eb1e777d98551ed62ea343864763
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sun Apr 4 00:12:52 2021 -0500
+
+    Running well, added blockedQ and Blocked Timing logic, need to add messageID for blockedQ, Finish blockedLogic in OSS, finish stats and format print to file
+
+commit 662ced8e76351bf87b356c14b4bd2dbd4a4b0168
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 20:59:51 2021 -0500
+
+    Fixed message error, save before adding blocked Q
+
+commit 1ba30bd89e7e9747d52324e22fbcf5646bd43df6
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 20:40:37 2021 -0500
+
+    Fixed message error, added user initialization guard
+
+commit f7c67a893e65de187bff202137c162628cb6137d
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 14:46:30 2021 -0500
+
+    msgsnd() Resource Temp Unavailable
+
+commit aa09aa59f8234383246ead94012560a94c0d3c8e
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 12:36:38 2021 -0500
+
+    Removed .o
+
+commit 62a8aa3f99f441f2500c980225c3b45b2921d0b5
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 12:36:13 2021 -0500
+
+    ran well
+
+commit a6a964e9654697fee3ac26f6d53495d23bb81a94
+Merge: 7e4f4d1 41f8071
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 11:54:17 2021 -0500
+
+    Merge branch 'dev' into main
+    Running well, need to fix, time add blocked queue and track stats
+
+commit 41f8071c88fe5b1da268bfbba35108d1a30d4bc7
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Apr 3 11:54:01 2021 -0500
+
+    Running and terminating, need to fix time and track each cpu event time
+
+commit 7e4f4d1b658985a340ac6b2cec54c612e761425b
+Merge: 5b3ca42 218fc9e
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Fri Apr 2 22:01:23 2021 -0500
+
+    Merge branch 'dev' into main
+    Commit Changes from Dev,
+
+commit 218fc9e0c5b87db2b63c3d36788cfde5af1fe291
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Fri Apr 2 22:01:06 2021 -0500
+
+    Tracking terminate...need to look at PID/index values
+
+commit 21fb14396b0c1fda59d2b01337ccda2f0b3f40a4
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Fri Apr 2 18:37:33 2021 -0500
+
+    Editing Messaging
+
+commit 5b3ca42e56e103ab8ab116bc46957cb9d5458453
+Merge: 8afaab2 14ca161
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 20:45:52 2021 -0500
+
+    Merge branch 'dev' into main
+    Added message IDs
+
+commit 14ca16187a511aac0b7a122df69be9c5a16c617b
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 20:45:26 2021 -0500
+
+    Added Message Id's
+
+commit 8afaab29ac1e2da95a53e7c4e58f1e3be25f97c2
+Merge: 57396ac dadb6ea
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 19:38:07 2021 -0500
+
+    Merge branch 'dev' into main
+    Added messaging and waiting between oss and user
+
+commit dadb6eac58438d445822f543e8e4154f0c9088ee
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 19:37:53 2021 -0500
+
+    Passing and waiting for messages between User and Oss
+
+commit d3c3da7f93acd7b592adb53451d35668c0744230
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 18:45:33 2021 -0500
+
+    Added another msg
+
+commit 57396ac5f493e121b5a8f700fdfddbda98d05e30
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 17:23:18 2021 -0500
+
+    Reset
+
+commit 657ce6753c928c0f6c01ee4da247905f0c9e64b7
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 17:19:54 2021 -0500
+
+    Removed .swp file
+
+commit 47c3d11656626a5debdfabbdf16224baceb4142c
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 17:18:19 2021 -0500
+
+    Update pcbTables
+
+commit 0e4ec3c1864c506854a55fe0e7adb7de1cdb2219
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 31 17:13:33 2021 -0500
+
+    Cleaned Up Files
+
+commit ba453a8afc274f8eaf55ff4be9c4e83df1fa66ed
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 24 18:30:13 2021 -0500
+
+    Added sysTimePrint(), Added CPU allocation function, need to allow CPU to wait for Process Return, and add function for Checking Blocked Queue
+
+commit 7990e1d9cf3e16ee2d7ca144e32671e4307ac537
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 23:37:31 2021 -0500
+
+    Removed .swp
+
+commit c469490637cec396e724e8207633289a19374629
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 23:36:15 2021 -0500
+
+    Added Queue features and Tested
+
+commit a67c2944ddaa441c392ac3bfde98f817b8b6d666
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 20:04:43 2021 -0500
+
+    Added Concurrent process monitoring and Waitpid, need to implement queue
+
+commit 4067aa30c07afc04dbd2a6687211a9b55fcdc62f
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 18:17:46 2021 -0500
+
+    Added PCB Table to Shared.h
+
+commit 94d0c458a968f28a6cecb498e60eea4bf438cfa4
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 15:54:45 2021 -0500
+
+    Added 3 Second Timer
+
+commit 7a27a6e09d6f8a7ee87665169d5d0972c49027ea
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Tue Mar 23 11:52:08 2021 -0500
+
+    Added Logfile Handling
+
+commit 3cf8b01b30ea77ff1536c34abc6babb33bbfaf88
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 22 17:34:22 2021 -0500
+
+    Added Cleaned Make Files after Bit Vector Addition
+
+commit f6624059a99ba68edc876a33604c1f819b103a01
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 22 17:33:36 2021 -0500
+
+    Added Bit Vector Functionality
+
+commit c260a4e4087ac968897c8aa3d5386091f78d16b5
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Mar 20 17:18:37 2021 -0500
+
+    Fixed Shared Memory Array Issue, Next need to schedule time in the "CPU"
+
+commit f484f6f5aa3608893d6ae622276c62af56ed6efa
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Mar 20 15:11:35 2021 -0500
+
+    Working on accessing PCB inside shared PID array
+
+commit 320def3d3d9a1085a23f276abf37612979530c34
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Mar 20 14:06:34 2021 -0500
+
+    Centralized library calls and headerfiles.
+
+commit a4676695678ab791d7789537ce4330ca3c9b2e96
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Mar 20 13:38:49 2021 -0500
+
+    Fixed Libraries and header files
+
+commit 22a83976a286703eae551598fd0ea7230c07377a
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Sat Mar 20 12:48:15 2021 -0500
+
+    Adjusted Clock added Sig Termination Cleanup
+
+commit e5d311cc55b32c6379601deeae5be6426cf7da6c
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Thu Mar 18 15:52:01 2021 -0500
+
+    Added Messaging and Tested Between Oss and User
+
+commit 27f6d984150ded02b0b12259170325a6979dad81
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Thu Mar 18 14:13:01 2021 -0500
+
+    Forked Child Process and Tested Shared System Timer functionality
+
+commit 0fed157a59196356067f7f0db7204016b8af60d6
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Thu Mar 18 13:05:56 2021 -0500
+
+    Updated sysTime.h
+
+commit bff8caa4313bb3c253519a557d1a1b5044ac7972
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Thu Mar 18 13:04:29 2021 -0500
+
+    Added System Timer in Shared Memory
+
+commit 53d63f519d1cae77656883c57fb7d47349b437a5
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 17 23:29:51 2021 -0500
+
+    Set up shared memory, clean up memory, set signal alarms and handling.
+
+commit 3c50663753013f8587a200db770d844b4fda76a0
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 17 19:50:41 2021 -0500
+
+    Added Command Args Parsing
+
+commit e260d13ac9b337fdafe1e1a73e31a63fba5a269f
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Wed Mar 17 17:33:23 2021 -0500
+
+    Added some circleQ
+
+commit ecf4fb251025ed14a9031202c8eded6d2264855a
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 15 17:41:53 2021 -0500
+
+    Testing Local push/pull/merge from Linux environment Complete
+
+commit 757ea33b7405942053a34c7f142696352440337e
+Merge: 5c6ebbe 0d1ab4a
+Author: Nick House <57774721+house84@users.noreply.github.com>
+Date:   Mon Mar 15 17:37:07 2021 -0500
+
+    Merge pull request #1 from house84/master
+    
+    Test
+
+commit 0d1ab4a930e213c6dd1466c4a3eda5b4d0415cdf
+Author: Nick House <n.house@me.com>
+Date:   Mon Mar 15 17:32:01 2021 -0500
+
+    Test
+
+commit 5c6ebbe3fec85384923675897f4ca4ec80288966
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 15 17:25:27 2021 -0500
+
+    Added System time to shared.h
+
+commit 2eaba8ad90a03278d65dad36237691e46127ff1d
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 15 16:44:33 2021 -0500
+
+    Initial File Creation Commit
+
+commit 23e6e951ae7fce7479fc46dff127d7a9bb216fb3
+Author: Nick House <nh6gy@umsystem.edu>
+Date:   Mon Mar 15 14:55:15 2021 -0500
+
+    First Commit
