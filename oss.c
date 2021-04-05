@@ -150,6 +150,7 @@ int main(int argc, char * argv[]){
 
 				//Message new Process Created 
 				fprintf(stderr, "OSS: Time: %s PID: %d\t|||| New User Process Created\n", getSysTime(), index);
+				fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| New User Process Created\n", getSysTime(), index);
 
 				//Add to RunQ
 				enqueue(index);
@@ -184,7 +185,6 @@ int main(int argc, char * argv[]){
 
 	//==========================================
 	
-	fprintf(stderr,"Total: %d\n", totalProc); 
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){} 
@@ -584,11 +584,9 @@ static void closeLogfile(){
 //Display Stats/Print Stats
 static void displayStats(){
 	
-//	float total = sysTimePtr->stats.totalProc-1; 
 	int total  = totalProc; 
-	fprintf(stderr,"Processes: %d CPU Time: %f\n",total,  sysTimePtr->stats.cpu_Time); 
 
-	//Print to logs and Display
+	//Print to Terminal
 	fprintf(stderr, "\n\n//////////////// PROGRAM REPORT ////////////////\n"); 
 	fprintf(stderr, "System Time: %f\n", getTime()); 
 	fprintf(stderr, "Average Process CPU Time: %f\n", sysTimePtr->stats.cpu_Time/total); 
@@ -597,6 +595,16 @@ static void displayStats(){
 	fprintf(stderr, "Average Process Blocked Time: %f\n", sysTimePtr->stats.blocked_Time/total); 
 	fprintf(stderr, "CPU Idle Time: %f\n", (getTime() - sysTimePtr->stats.cpu_Time)); 
 	fprintf(stderr, "//////////////// |||||||||||||| ////////////////\n"); 
+	
+	//Print to logs
+	fprintf(logfilePtr, "\n\n//////////////// PROGRAM REPORT ////////////////\n"); 
+	fprintf(logfilePtr, "System Time: %f\n", getTime()); 
+	fprintf(logfilePtr, "Average Process CPU Time: %f\n", sysTimePtr->stats.cpu_Time/total); 
+	fprintf(logfilePtr, "Average Process System Time: %f\n", sysTimePtr->stats.system_Time/total); 
+	fprintf(logfilePtr, "Average Process Wait Time: %f\n", (sysTimePtr->stats.waited_Time/total)); 
+	fprintf(logfilePtr, "Average Process Blocked Time: %f\n", sysTimePtr->stats.blocked_Time/total); 
+	fprintf(logfilePtr, "CPU Idle Time: %f\n", (getTime() - sysTimePtr->stats.cpu_Time)); 
+	fprintf(logfilePtr, "//////////////// |||||||||||||| ////////////////\n"); 
 }	
 
 
@@ -629,6 +637,7 @@ static void enqueue(int idx){
 
 	//Test Print
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to position %d in Run Queue\n", getSysTime(), newNode->fakePID, GQue->currSize); 
+	fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Added to position %d in Run Queue\n", getSysTime(), newNode->fakePID, GQue->currSize); 
 
 	//Check if Empty
 	if( GQue->head == NULL && GQue->tail == NULL ){
@@ -664,6 +673,7 @@ struct p_Node * dequeue(){
 
 	//Test Print
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed from Run Queue\n", getSysTime(), newNode->fakePID); 
+	fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Removed from Run Queue\n", getSysTime(), newNode->fakePID); 
 
 	return newNode; 
 
@@ -731,6 +741,7 @@ static void allocateCPU(){
 
 	//Print Update from CPU 
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Sent to CPU\n", getSysTime(), idx); 
+	fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Sent to CPU\n", getSysTime(), idx); 
 
 
 	//Wait for message from User to simulate end CPU 
@@ -745,6 +756,7 @@ static void allocateCPU(){
 	
 	//Show Time Run
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Spent %d nanoseconds in CPU\n", getSysTime(), idx, sprint); 
+	fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Spent %d nanoseconds in CPU\n", getSysTime(), idx, sprint); 
 	
 	//Check return
 	if( strcmp(bufR.mtext, "terminated") == 0){
@@ -755,6 +767,7 @@ static void allocateCPU(){
 		
 		//Print Update for Ready
 		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Terminated\n", getSysTime(), idx); 
+		fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Terminated\n", getSysTime(), idx); 
 
 		
 		return; 
@@ -766,6 +779,7 @@ static void allocateCPU(){
 
 		//Print Update
 		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Added to Blocked Queue\n", getSysTime(), idx);
+		fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Added to Blocked Queue\n", getSysTime(), idx);
 
 		return; 
 	}
@@ -786,6 +800,7 @@ static void dispatchTime(int idx){
 	incrementSysTime(disTime); 
 	
 	fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Time in Dispatch %d nanoseconds\n", getSysTime(), idx, disTime);
+	fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Time in Dispatch %d nanoseconds\n", getSysTime(), idx, disTime);
 
 }
 
@@ -813,6 +828,7 @@ static void checkBlockedQ(){
 		if( blockedQ[i] == 1 && sysTimePtr->pcbTable[i].wake_Up <= localT ){
 			
 		fprintf(stderr, "OSS: Time: %s PID: %d\t|||| Removed From Blocked Queue\n", getSysTime(), i);
+		fprintf(logfilePtr, "OSS: Time: %s PID: %d\t|||| Removed From Blocked Queue\n", getSysTime(), i);
 			enqueue(i);
 			blockedQ[i] = 0; 
 		}
