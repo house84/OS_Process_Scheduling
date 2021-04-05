@@ -35,7 +35,7 @@ struct PCB{
 //Hold Stats 
 struct STAT{
 
-	int totalProc; 
+	float totalProc; 
 	float cpu_Time; 
 	float system_Time; 
 	float waited_Time;

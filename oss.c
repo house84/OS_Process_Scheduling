@@ -64,10 +64,6 @@ int main(int argc, char * argv[]){
 	//Set timer
 	setTimer(myTimer); 
 
-	//Set 3 Second Timer
-	stopProdTimer = false; 
-	setTimer2(3); 
-
 	//Create Shared Memory
 	createSharedMemory(); 
 	
@@ -102,8 +98,32 @@ int main(int argc, char * argv[]){
 	float newUser = getTime() + newUserTime(); 
 	concProc = 0; 
 	
+	//Set 3 Second Timer
+	stopProdTimer = false; 
+
+//	setTimer2(3); 
+	time_t now; 
+	struct tm *tm; 
+	now = time(0); 
+	
+	tm = localtime(&now);
+	int startSeconds = tm->tm_sec; 
+
 	while(true){
 
+		//Check Timer
+		if(stopProdTimer == false){
+			
+			now = time(0); 
+			tm = localtime(&now); 
+			int stopSeconds = tm->tm_sec; 
+
+			if((stopSeconds - startSeconds) >= 3){
+				stopProdTimer = true; 
+			} 
+		}
+
+		
 		//Increment System Time by NanoSeconds
 		iterTime = rand()%10000001 + 1000000000; 
 		incrementSysTime(iterTime); 
@@ -111,7 +131,7 @@ int main(int argc, char * argv[]){
 		checkBlockedQ(); 
 		
 		//Spawn Child Process //Set to 20 for testing
-		if( concProc < 18 && totalProc < 100 && stopProdTimer == false && newUser < getTime()){
+		if( concProc < 18 && totalProc < 100 && stopProdTimer == false && (newUser < getTime())){
 
 			index = getBitVectorPos(); 
 			if(index != -1) { 
@@ -119,7 +139,7 @@ int main(int argc, char * argv[]){
 				spawn(index); 
 				++totalProc; 
 				++concProc;
-				sysTimePtr->stats.totalProc = totalProc; 
+			//	++sysTimePtr->stats.totalProc; 
 
 				//Allow User to initialize
 				if(msgrcv(shmidMsg3, &buf3, sizeof(buf3.mtext), index+1, 0) == -1){
@@ -164,6 +184,7 @@ int main(int argc, char * argv[]){
 
 	//==========================================
 	
+	fprintf(stderr,"Total: %d\n", totalProc); 
 
 	//Allow Processes to finish
 	while(wait(NULL) > 0){} 
@@ -563,17 +584,18 @@ static void closeLogfile(){
 //Display Stats/Print Stats
 static void displayStats(){
 	
-	float total = sysTimePtr->stats.totalProc; 
-
-	fprintf(stderr,"CPU Time: %f\n", sysTimePtr->stats.cpu_Time); 
+//	float total = sysTimePtr->stats.totalProc-1; 
+	int total  = totalProc; 
+	fprintf(stderr,"Processes: %d CPU Time: %f\n",total,  sysTimePtr->stats.cpu_Time); 
 
 	//Print to logs and Display
 	fprintf(stderr, "\n\n//////////////// PROGRAM REPORT ////////////////\n"); 
+	fprintf(stderr, "System Time: %f\n", getTime()); 
 	fprintf(stderr, "Average Process CPU Time: %f\n", sysTimePtr->stats.cpu_Time/total); 
 	fprintf(stderr, "Average Process System Time: %f\n", sysTimePtr->stats.system_Time/total); 
-	fprintf(stderr, "Average Process Wait Time: %f\n", sysTimePtr->stats.waited_Time/total); 
+	fprintf(stderr, "Average Process Wait Time: %f\n", (sysTimePtr->stats.waited_Time/total)); 
 	fprintf(stderr, "Average Process Blocked Time: %f\n", sysTimePtr->stats.blocked_Time/total); 
-	fprintf(stderr, "CPU Idle Time: %f\n", sysTimePtr->stats.end_Time - sysTimePtr->stats.cpu_Time); 
+	fprintf(stderr, "CPU Idle Time: %f\n", (getTime() - sysTimePtr->stats.cpu_Time)); 
 	fprintf(stderr, "//////////////// |||||||||||||| ////////////////\n"); 
 }	
 

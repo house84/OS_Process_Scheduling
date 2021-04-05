@@ -39,17 +39,11 @@ int main(int argc, char * argv[]){
 
 	while(run == true){
 
-
 		//Recienve Message to Run from CPU
 		msgrcv(shmidMsg, &bufS, sizeof(bufS.mtext), mID, 0);
-
-		waitLocal2 = getTime(); 
-		sysTimePtr->pcbTable[idx].waited_Time += (waitLocal2 - waitLocal1); 
 		
-		fprintf(stderr, "(((((((((((%f  wait; %f\n", waitLocal1, sysTimePtr->pcbTable[idx].waited_Time); 
 		//Send Message Back to OSS
 		sendMessage(shmidMsg2, mID); 
-		waitLocal1 = getTime(); 
 	}
 
 	//Free Memory
@@ -115,10 +109,10 @@ static void sendMessage(int msgid, int idx){
 	 	printStats(idx); 
 	}
 
-	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext), 0)) == -1){
+	if((msgsnd(msgid, &bufS, sizeof(bufS.mtext), SA_RESTART)) == -1){
 
-		perror("user: ERROR: Failed to msgsnd() ");
-		exit(EXIT_FAILURE); 
+			perror("user: ERROR: Failed to msgsnd() ");
+			exit(EXIT_FAILURE);
 	}
 }
 
@@ -199,6 +193,15 @@ static void updateGlobal(int idx){
 //Display stats upon Termination
 static void printStats(int idx){
 
+	float currTime = getTime(); 
+	float cpu = sysTimePtr->pcbTable[idx].cpu_Time; 
+	float start = sysTimePtr->pcbTable[idx].time_Started; 
+	float blocked = sysTimePtr->pcbTable[idx].blocked_Time; 
+	float system = sysTimePtr->pcbTable[idx].system_Time; 
+	float wait = (currTime - ( start + cpu + blocked )); 
+	
+	sysTimePtr->pcbTable[idx].waited_Time += wait; 
+
 	fprintf(stderr, "\n//////////// USER PROCESS STATS ////////////\n");
 	fprintf(stderr, "Time: %f\n", getTime()); 
 	fprintf(stderr, "User ID: %d\n", idx-1); 
@@ -206,6 +209,7 @@ static void printStats(int idx){
 	fprintf(stderr, "Total System Time (seconds): %f\n", sysTimePtr->pcbTable[idx].system_Time); 
 	fprintf(stderr, "Total CPU Time (seconds): %f\n", sysTimePtr->pcbTable[idx].cpu_Time); 
 	fprintf(stderr, "Total Waited Time (seconds): %f\n", sysTimePtr->pcbTable[idx].waited_Time); 
+//	fprintf(stderr, "Total Waited Time (seconds): %f\n", wait); 
 	fprintf(stderr, "Total blocked Time (seconds): %f\n", sysTimePtr->pcbTable[idx].blocked_Time); 
 	fprintf(stderr, "//////////// |||||||||||||||||| ////////////\n\n");
 }

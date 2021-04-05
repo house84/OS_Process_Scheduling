@@ -37,6 +37,7 @@ static void setTimer();                //Set initial Timer
 void setBitVectorVal();                //Set BitVector used from idx
 static float getTime();                //Get time with decimal xx.xxx
 static void setTimer2();               //Set 3 Second Timer
+static void initStats();               //Initiate Stats
 void unsetBitVectorVal();              //Clear Bitvector from idx
 static void setSysTime();              //Set the System Time
 const char *getSysTime();              //Return formatted System Time
