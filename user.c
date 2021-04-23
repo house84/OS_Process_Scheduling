@@ -69,9 +69,10 @@ static float getRandTime(){
 }
 
 //Message_t ready = 0 , blocked = 1, terminated = 3
-static void sendMessage(int msgid, int idx){
+static void sendMessage(int msgid, int mID){
 
-	bufS.mtype = idx; 
+	bufS.mtype = mID;
+	int idx = mID - 1; 
 
 	//Get Type of message
 	int messageT = getMessageType(idx); 
@@ -201,6 +202,7 @@ static void printStats(int idx){
 	float wait = (currTime - ( start + cpu + blocked )); 
 	
 	sysTimePtr->pcbTable[idx].waited_Time += wait; 
+	sysTimePtr->stats.waited_Time += wait; 
 
 	fprintf(stderr, "\n//////////// USER PROCESS STATS ////////////\n");
 	fprintf(stderr, "Time: %f\n", getTime()); 
